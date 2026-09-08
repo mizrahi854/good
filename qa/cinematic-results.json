@@ -1,0 +1,47 @@
+[
+  {
+    "check": "desktop controls, reverse scroll and 180-frame scrub",
+    "metrics": {
+      "median": 16.69999998807907,
+      "p95": 17.5,
+      "max": 17.900000005960464
+    }
+  },
+  {
+    "check": "same-size bottle landing",
+    "maxPixelDelta": 0.006622314453125
+  },
+  {
+    "check": "390×844",
+    "overflow": 0,
+    "ctaVisible": true
+  },
+  {
+    "check": "360×740",
+    "overflow": 0,
+    "ctaVisible": true
+  },
+  {
+    "check": "320×640",
+    "overflow": 0,
+    "ctaVisible": true
+  },
+  {
+    "check": "768×1024",
+    "overflow": 0,
+    "ctaVisible": true
+  },
+  {
+    "check": "844×390",
+    "overflow": 0,
+    "ctaVisible": true
+  },
+  {
+    "check": "mobile navigation, ritual controls and reduced motion",
+    "passed": true
+  },
+  {
+    "errors": [],
+    "bad": []
+  }
+]

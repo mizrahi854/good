@@ -1,0 +1,1316 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#cbbbe6">
+  <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<title>GOOM — הטוב שלך, בגומי</title>
+<meta name="description" content="תוספי תזונה מדויקים בגומי לשגרה שמרגישה טוב.">
+<style>
+@font-face { font-family:'Discovery FS'; src:url('assets/fonts/discovery-regular.woff') format('woff'); font-weight:400; font-display:swap; }
+@font-face { font-family:'Discovery FS'; src:url('assets/fonts/discovery-medium.woff') format('woff'); font-weight:500 900; font-display:swap; }
+
+:root {
+  --goom-purple:#2e2170;
+  --goom-lilac:#ceb9e3;
+  --goom-orange:#f45f2b;
+  --goom-cream:#fff8ea;
+  --goom-ease:cubic-bezier(.23,1,.32,1);
+  --goom-move:cubic-bezier(.77,0,.175,1);
+}
+
+* { box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body { margin:0; background:#ceb9e3; color:#2e2170; font-family:'Discovery FS',Arial,sans-serif; -webkit-font-smoothing:antialiased; }
+body,button,a { font-family:'Discovery FS',Arial,sans-serif; }
+img,video { max-width:100%; }
+a { color:#2e2170; text-decoration:none; }
+a:hover { color:#5b3fa8; }
+button { color:inherit; }
+:focus-visible { outline:3px solid #f45f2b; outline-offset:4px; }
+.visually-hidden { position:absolute!important; width:1px!important; height:1px!important; padding:0!important; margin:-1px!important; overflow:hidden!important; clip:rect(0,0,0,0)!important; white-space:nowrap!important; border:0!important; }
+
+@keyframes goomMarqueeA { from { transform:translateX(0); } to { transform:translateX(-50%); } }
+@keyframes goomMarqueeB { from { transform:translateX(-50%); } to { transform:translateX(0); } }
+@keyframes goomFloat { 0%,100% { transform:translate(-50%,-50%) translateY(0) rotate(var(--rot,0deg)); } 50% { transform:translate(-50%,-50%) translateY(-14px) rotate(var(--rot,0deg)); } }
+@keyframes goomHint { 0%,100% { transform:translateY(0); opacity:.45; } 50% { transform:translateY(9px); opacity:1; } }
+
+.goom-page { color:#2e2170; background:#fff; overflow-x:clip; line-height:1.6; }
+
+/* ---------- Liquid-glass toolbar ---------- */
+.goom-header {
+  position:fixed;
+  inset:14px 0 auto 0;
+  z-index:60;
+  display:flex;
+  justify-content:center;
+  padding:0 clamp(12px,3vw,28px);
+  pointer-events:none;
+}
+.goom-bar {
+  position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:clamp(14px,3vw,40px);
+  width:min(100%,1180px);
+  padding-block:9px;
+  padding-inline:24px 10px;
+  border-radius:999px;
+  overflow:hidden;
+  pointer-events:auto;
+  isolation:isolate;
+  background:linear-gradient(155deg,rgba(255,255,255,.62),rgba(255,255,255,.26) 46%,rgba(255,255,255,.44));
+  backdrop-filter:blur(20px) saturate(190%);
+  -webkit-backdrop-filter:blur(20px) saturate(190%);
+  box-shadow:
+    0 1px 0 rgba(255,255,255,.9) inset,
+    0 -1px 0 rgba(255,255,255,.35) inset,
+    0 10px 34px rgba(46,33,112,.16),
+    0 2px 8px rgba(46,33,112,.08);
+  transition:box-shadow 320ms var(--goom-ease),background 320ms ease;
+}
+.goom-bar::before {
+  content:'';
+  position:absolute;
+  inset:0;
+  border-radius:inherit;
+  padding:1px;
+  background:linear-gradient(150deg,rgba(255,255,255,.95),rgba(255,255,255,.15) 42%,rgba(255,255,255,.7));
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+  mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;
+  mask-composite:exclude;
+  pointer-events:none;
+}
+/* the specular streak that sells the glass */
+.goom-bar::after {
+  content:'';
+  position:absolute;
+  inset:0 auto 0 -30%;
+  width:38%;
+  background:linear-gradient(100deg,transparent,rgba(255,255,255,.72),transparent);
+  transform:skewX(-16deg);
+  opacity:.5;
+  pointer-events:none;
+  transition:transform 900ms var(--goom-ease);
+}
+.goom-bar:hover::after { transform:skewX(-16deg) translateX(340%); }
+.goom-header.is-scrolled .goom-bar {
+  background:linear-gradient(155deg,rgba(255,255,255,.76),rgba(255,255,255,.42) 46%,rgba(255,255,255,.58));
+  box-shadow:
+    0 1px 0 rgba(255,255,255,.95) inset,
+    0 14px 40px rgba(46,33,112,.2),
+    0 3px 10px rgba(46,33,112,.1);
+}
+.goom-brand { display:flex; align-items:center; flex:none; }
+.goom-brand img { height:26px; width:auto; display:block; }
+.goom-nav { display:flex; align-items:center; gap:2px; font-size:14.5px; font-weight:500; white-space:nowrap; }
+.goom-nav a {
+  position:relative;
+  padding:9px 16px;
+  border-radius:999px;
+  color:#2b1767;
+  transition:background 220ms ease,color 220ms ease;
+}
+.goom-nav a:hover { background:rgba(255,255,255,.6); color:#2b1767; }
+.goom-bar-cta {
+  display:inline-flex;
+  align-items:center;
+  flex:none;
+  padding:11px 22px;
+  border-radius:999px;
+  background:#2b1767;
+  color:#fff;
+  font-size:14px;
+  font-weight:500;
+  transition:background 220ms ease,transform 220ms var(--goom-ease);
+}
+.goom-bar-cta:hover { background:var(--goom-orange); color:#fff; transform:translateY(-1px); }
+.goom-menu { display:none; width:44px; height:44px; place-content:center; gap:5px; border:0; background:transparent; cursor:pointer; padding:0; border-radius:999px; }
+.goom-menu i { display:block; width:22px; height:2px; border-radius:2px; background:#2b1767; }
+.goom-menu i:last-child { width:15px; margin-inline-start:auto; }
+
+/* ---------- Hero: scroll scrubs the supplied film ----------
+   The frames are pre-cropped so the film's own baked toolbar and baked type are
+   gone; the headline beside it is live text in the brand face. */
+.hero {
+  --p:0;
+  position:relative;
+  height:225dvh;
+  background:#cbbbe6;
+}
+.hero-pin {
+  position:sticky;
+  top:0;
+  height:100dvh;
+  overflow:hidden;
+  background:radial-gradient(120% 110% at 22% 46%,#d6c9ee 0%,#cbbbe6 52%,#bcaadd 100%);
+}
+.hero-film {
+  position:absolute;
+  inset:0;
+  overflow:hidden;
+}
+.hero-canvas,.hero-poster {
+  position:absolute;
+  inset:0;
+  display:block;
+  width:100%;
+  height:100%;
+  max-width:none;
+  object-fit:cover;
+  object-position:center;
+  transform:scale(calc(1 + var(--p) * .03));
+}
+.hero-canvas { opacity:0; transition:opacity 420ms var(--goom-ease); }
+.hero.is-film-ready .hero-canvas { opacity:1; }
+.hero.is-film-ready .hero-poster { opacity:0; transition:opacity 260ms var(--goom-ease); }
+
+/* The keyframe export is clean — the only thing to hide is the brand mark that
+   appears in the closing shot. */
+/* sized by transform, not width/height — these resize mid-scroll and layout
+   thrash there is exactly where it would be felt */
+.hero-matte { position:absolute; z-index:2; pointer-events:none; will-change:transform; transition:transform 420ms var(--goom-ease),opacity 420ms var(--goom-ease); }
+.hero.has-mark { --matte-tr:1; }
+.hero-matte-tr {
+  inset:0 0 auto auto;
+  width:clamp(230px,24%,350px);
+  height:clamp(170px,27%,250px);
+  transform-origin:right top;
+  transform:scale(var(--matte-tr,0));
+  background:radial-gradient(115% 130% at 100% 18%,#cbbbe6 52%,rgba(203,187,230,0) 80%);
+}
+
+
+.hero-copy {
+  position:absolute;
+  z-index:4;
+  opacity:0;
+  visibility:hidden;
+  transition:opacity 460ms var(--goom-ease),transform 620ms var(--goom-ease),visibility 460ms;
+}
+.hero-copy.is-on { opacity:1; visibility:visible; }
+.hero-copy[data-scene="1"] {
+  left:clamp(20px,4.5vw,74px);
+  top:50%;
+  width:min(31vw,430px);
+  text-align:right;
+  transform:translateY(-50%) translateY(18px);
+}
+.hero-copy[data-scene="1"].is-on { transform:translateY(-50%); }
+.hero-copy[data-scene="3"] {
+  right:clamp(20px,4.5vw,74px);
+  bottom:clamp(56px,9vh,104px);
+  width:min(34vw,420px);
+  text-align:right;
+  transform:translateY(18px);
+}
+.hero-copy[data-scene="3"].is-on { transform:none; }
+
+.hero-wordmark {
+  display:block;
+  margin:0 0 clamp(14px,2vw,26px);
+  color:#4a2f9b;
+  font-size:clamp(70px,11.2vw,168px);
+  font-weight:900;
+  line-height:.76;
+  letter-spacing:-.06em;
+  background:linear-gradient(168deg,#6b4fbe 0%,#4a2f9b 46%,#2b1767 100%);
+  -webkit-background-clip:text;
+  background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+.hero-copy .f-eyebrow { display:block; margin-bottom:14px; color:rgba(43,23,103,.5); font-size:11px; font-weight:500; letter-spacing:.26em; }
+.hero-copy h1,.hero-copy h2 { margin:0; color:#2b1767; font-size:clamp(24px,2.7vw,40px); font-weight:500; line-height:1.08; letter-spacing:-.04em; }
+.hero-copy .hero-sub { margin:12px 0 0; margin-inline-start:auto; color:#a33512; font-size:clamp(12px,1vw,14px); font-weight:900; letter-spacing:.16em; text-align:right; }
+.hero-copy p { margin:14px 0 0; margin-inline-start:auto; max-width:30ch; color:rgba(43,23,103,.72); font-size:clamp(15px,1.2vw,18px); line-height:1.6; }
+.hero-actions { display:flex; flex-wrap:wrap; justify-content:flex-end; gap:12px; margin-top:clamp(20px,2.4vw,32px); }
+.hero-btn {
+  display:inline-flex;
+  align-items:center;
+  min-height:52px;
+  padding:14px 30px;
+  border-radius:999px;
+  background:#2b1767;
+  color:#fff;
+  font-size:15px;
+  font-weight:500;
+  transition:background 220ms ease,transform 220ms var(--goom-ease);
+}
+.hero-btn:hover { background:var(--goom-orange); color:#fff; transform:translateY(-2px); }
+.hero-btn.ghost {
+  background:rgba(255,255,255,.66);
+  color:#2b1767;
+  backdrop-filter:blur(14px) saturate(170%);
+  -webkit-backdrop-filter:blur(14px) saturate(170%);
+  box-shadow:0 1px 0 rgba(255,255,255,.95) inset,0 0 0 1px rgba(43,23,103,.14),0 8px 24px rgba(46,33,112,.14);
+}
+.hero-btn.ghost:hover { background:#fff; color:#2b1767; }
+
+.hero-cue { position:absolute; z-index:5; left:50%; bottom:24px; display:grid; justify-items:center; gap:9px; color:#2b1767; font-size:10px; font-weight:500; letter-spacing:.34em; transform:translateX(-50%); opacity:calc(1 - var(--p) * 5); }
+.hero-cue i { display:block; width:1px; height:40px; background:linear-gradient(#2b1767,rgba(43,23,103,0)); animation:goomHint 2.1s var(--goom-ease) infinite; }
+
+/* ---------- How it works: three glass steps on a 3D reveal ---------- */
+.how { position:relative; overflow:clip; padding:clamp(84px,9vw,140px) clamp(18px,5vw,84px); background:linear-gradient(180deg,#e3d5f7,#cbb8ec); }
+.how::before { content:''; position:absolute; left:-10%; top:-30%; width:60%; height:120%; background:radial-gradient(closest-side,rgba(255,255,255,.6),transparent 70%); pointer-events:none; }
+.how-inner { position:relative; max-width:1320px; margin-inline:auto; }
+.how-head { display:flex; flex-wrap:wrap; align-items:flex-end; justify-content:space-between; gap:20px 56px; margin-bottom:clamp(40px,5vw,68px); }
+.how-head .f-eyebrow { display:block; margin-bottom:14px; color:rgba(43,23,103,.5); font-size:11px; font-weight:500; letter-spacing:.26em; }
+.how-head h2 { max-width:15ch; margin:0; color:#2b1767; font-size:clamp(30px,3.4vw,50px); font-weight:500; line-height:1.05; letter-spacing:-.04em; }
+.how-head p { margin:0 0 6px; max-width:36ch; color:rgba(43,23,103,.68); font-size:clamp(15px,1.15vw,17px); line-height:1.62; text-align:left; }
+.how-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:clamp(16px,2vw,28px); perspective:1200px; }
+.how-card {
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+  padding:clamp(28px,2.8vw,40px);
+  border-radius:28px;
+  overflow:hidden;
+  background:linear-gradient(158deg,rgba(255,255,255,.9),rgba(255,255,255,.52) 52%,rgba(255,255,255,.74));
+  backdrop-filter:blur(20px) saturate(190%);
+  -webkit-backdrop-filter:blur(20px) saturate(190%);
+  box-shadow:0 1px 0 rgba(255,255,255,1) inset,0 0 0 1px rgba(43,23,103,.07),0 20px 50px rgba(56,30,116,.18);
+  transform-style:preserve-3d;
+  transform:translateY(30px) rotateX(9deg);
+  opacity:0;
+  transition:transform 780ms var(--goom-ease),opacity 620ms var(--goom-ease),box-shadow 300ms ease;
+}
+.how-card.is-visible { transform:none; opacity:1; }
+.how-card:nth-child(2) { transition-delay:110ms; }
+.how-card:nth-child(3) { transition-delay:220ms; }
+.how-card:hover { box-shadow:0 1px 0 rgba(255,255,255,.95) inset,0 26px 56px rgba(56,30,116,.2); }
+.how-card::after { content:''; position:absolute; inset:0; border-radius:inherit; padding:1px; background:linear-gradient(150deg,rgba(255,255,255,.95),rgba(255,255,255,.1) 46%,rgba(255,255,255,.7)); -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0); mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0); -webkit-mask-composite:xor; mask-composite:exclude; pointer-events:none; }
+.how-step { display:grid; place-items:center; width:44px; height:44px; border-radius:50%; background:#2b1767; color:#fff; font-size:15px; font-weight:500; }
+.how-card h3 { margin:0; color:#2b1767; font-size:clamp(21px,2vw,27px); font-weight:500; line-height:1.14; letter-spacing:-.03em; }
+.how-card p { margin:0; color:rgba(43,23,103,.7); font-size:15.5px; line-height:1.66; }
+
+/* ---------- FAQ ---------- */
+.faq { position:relative; padding:clamp(84px,9vw,140px) clamp(18px,5vw,84px); background:#fff8ea; }
+.faq-inner { max-width:1080px; margin-inline:auto; display:grid; grid-template-columns:minmax(0,.62fr) minmax(0,1fr); gap:clamp(32px,5vw,80px); align-items:start; }
+.faq-head .f-eyebrow { display:block; margin-bottom:16px; color:rgba(43,23,103,.5); font-size:11px; font-weight:500; letter-spacing:.26em; }
+.faq-head h2 { margin:0; color:#2b1767; font-size:clamp(30px,3.8vw,54px); font-weight:500; line-height:1.04; letter-spacing:-.045em; }
+.faq-head p { margin:18px 0 0; color:rgba(43,23,103,.66); font-size:16px; line-height:1.62; }
+.faq-head a { display:inline-flex; margin-top:22px; padding-block:7px; border-bottom:1px solid currentColor; color:#a33512; font-size:14px; font-weight:500; }
+.faq-list { display:grid; }
+.faq-item { border-bottom:1px solid rgba(43,23,103,.16); }
+.faq-item:first-child { border-top:1px solid rgba(43,23,103,.16); }
+.faq-q {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:20px;
+  width:100%;
+  padding:22px 0;
+  border:0;
+  background:transparent;
+  color:#2b1767;
+  font-size:clamp(16px,1.4vw,19px);
+  font-weight:500;
+  line-height:1.4;
+  text-align:start;
+  cursor:pointer;
+}
+.faq-q span:last-child { position:relative; flex:none; width:20px; height:20px; }
+.faq-q span:last-child::before,
+.faq-q span:last-child::after { content:''; position:absolute; left:50%; top:50%; background:#2b1767; transform:translate(-50%,-50%); transition:transform 340ms var(--goom-move),opacity 240ms ease; }
+.faq-q span:last-child::before { width:16px; height:1.5px; }
+.faq-q span:last-child::after { width:1.5px; height:16px; }
+.faq-item.is-open .faq-q span:last-child::after { transform:translate(-50%,-50%) rotate(90deg); opacity:0; }
+.faq-a { display:grid; grid-template-rows:0fr; transition:grid-template-rows 420ms var(--goom-move); }
+.faq-item.is-open .faq-a { grid-template-rows:1fr; }
+.faq-a > div { overflow:hidden; }
+.faq-a p { margin:0; padding:0 0 24px; max-width:62ch; color:rgba(43,23,103,.7); font-size:15.5px; line-height:1.68; }
+
+/* ---------- Formula stage: the 3D depth carousel of the five bottles ---------- */
+.formula {
+  --f-ink:#2b1767;
+  position:relative;
+  height:290dvh;
+  background:#cbbbe6;
+}
+.formula-pin { position:sticky; top:0; height:100dvh; overflow:hidden; background:#cbbbe6; }
+.formula-blob { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; }
+.formula-plate {
+  position:absolute;
+  inset:0;
+  max-width:none;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  object-position:68% 50%;
+  transform:scale(var(--blob-scale,1));
+  transition:transform 900ms var(--goom-ease);
+}
+
+.formula-head {
+  position:absolute;
+  z-index:4;
+  right:clamp(20px,4.4vw,74px);
+  top:50%;
+  width:min(28vw,312px);
+  text-align:right;
+  transform:translateY(-50%);
+}
+.formula-head .f-eyebrow { display:block; margin-bottom:16px; color:rgba(43,23,103,.5); font-size:11px; font-weight:500; letter-spacing:.26em; }
+.formula-head h2 { margin:0; color:var(--f-ink); font-size:clamp(26px,2.7vw,40px); font-weight:500; line-height:1.1; letter-spacing:-.04em; }
+.formula-head .f-rule { width:52px; height:1px; margin:26px 0 26px auto; background:rgba(43,23,103,.28); }
+
+.formula-stage { position:absolute; inset:0 min(28vw,312px) 0 0; z-index:3; display:grid; place-items:center; perspective:1500px; perspective-origin:50% 46%; }
+.formula-rail { position:relative; width:100%; height:100%; transform-style:preserve-3d; }
+.formula-item {
+  position:absolute;
+  left:50%;
+  top:46%;
+  width:clamp(190px,17vw,268px);
+  margin:0;
+  padding:0;
+  border:0;
+  background:transparent;
+  color:inherit;
+  cursor:pointer;
+  transform-style:preserve-3d;
+  transform:translate(-50%,-50%) translate3d(var(--x,0),var(--y,0),var(--z,0)) rotateY(var(--ry,0deg));
+  transition:transform 780ms var(--goom-move),opacity 520ms var(--goom-ease),filter 520ms var(--goom-ease);
+  will-change:transform;
+}
+.formula-item img { display:block; width:100%; height:auto; filter:drop-shadow(0 34px 44px rgba(52,26,110,.34)); }
+.formula-item::after {
+  content:'';
+  position:absolute;
+  left:50%;
+  bottom:-6%;
+  width:78%;
+  height:26px;
+  border-radius:50%;
+  background:radial-gradient(50% 50% at 50% 50%,rgba(60,32,120,.34),transparent 72%);
+  transform:translateX(-50%) translateZ(-1px);
+}
+.formula-item.is-dim img { filter:drop-shadow(0 22px 34px rgba(52,26,110,.28)) brightness(.97); }
+
+.formula-arrows { position:absolute; z-index:6; left:clamp(20px,4.4vw,74px); bottom:clamp(84px,12vh,132px); display:flex; gap:10px; }
+.formula-arrow {
+  display:grid;
+  place-items:center;
+  width:52px;
+  height:52px;
+  border:1px solid rgba(43,23,103,.22);
+  border-radius:50%;
+  background:rgba(255,255,255,.62);
+  backdrop-filter:blur(14px) saturate(170%);
+  -webkit-backdrop-filter:blur(14px) saturate(170%);
+  color:var(--f-ink);
+  font-size:20px;
+  cursor:pointer;
+  transition:background 180ms ease,transform 140ms var(--goom-ease);
+}
+.formula-arrow:hover { background:#fff; }
+.formula-arrow:active { transform:scale(.94); }
+.formula-item { cursor:pointer; }
+
+.formula-caption { min-height:246px; }
+.formula-caption .f-kicker { display:block; direction:ltr; unicode-bidi:isolate; text-align:right; margin-bottom:12px; color:var(--f-accent-ink,#a33512); font-size:11px; font-weight:500; letter-spacing:.22em; text-transform:uppercase; }
+.formula-caption h3 { margin:0; color:var(--f-ink); font-size:clamp(23px,2.3vw,34px); font-weight:500; line-height:1.02; letter-spacing:-.04em; }
+.formula-caption p { margin:14px 0 0; color:rgba(43,23,103,.7); font-size:clamp(14px,1.15vw,17px); line-height:1.6; }
+.formula-caption ul { margin:18px 0 0; padding:0; list-style:none; display:grid; gap:7px; }
+.formula-caption li { position:relative; padding-inline-start:15px; color:rgba(43,23,103,.6); font-size:13px; }
+.formula-caption li::before { content:''; position:absolute; inset-inline-start:0; top:.6em; width:5px; height:5px; border-radius:50%; background:var(--f-accent,#f45f2b); }
+.formula-caption .f-cta { display:inline-flex; align-items:center; gap:10px; margin-top:26px; padding:13px 26px; border-radius:99px; background:var(--f-ink); color:#fff; font-size:14px; font-weight:500; transition:background 220ms ease,transform 220ms var(--goom-ease); }
+.formula-caption .f-cta:hover { background:var(--f-accent-ink,#a33512); color:#fff; transform:translateY(-2px); }
+.formula-caption-inner { transition:opacity 340ms var(--goom-ease),transform 340ms var(--goom-ease); }
+.formula-caption.is-swapping .formula-caption-inner { opacity:0; transform:translateY(12px); }
+
+.formula-track {
+  position:absolute;
+  z-index:5;
+  right:clamp(20px,4.4vw,74px);
+  left:clamp(20px,4.4vw,74px);
+  bottom:clamp(30px,4.6vh,54px);
+  max-width:none;
+}
+.formula-track-line { position:relative; height:1px; background:rgba(43,23,103,.34); }
+.formula-track-fill { position:absolute; inset:0; transform-origin:left center; transform:scaleX(0); background:var(--f-accent,#f45f2b); transition:transform 620ms var(--goom-move); }
+.formula-nodes { position:absolute; inset:0; display:flex; justify-content:space-between; align-items:center; }
+.formula-node { position:relative; width:34px; height:34px; padding:0; border:0; background:transparent; cursor:pointer; }
+.formula-node i { position:absolute; left:50%; top:50%; width:10px; height:10px; border-radius:50%; background:#fff; box-shadow:0 0 0 1px rgba(43,23,103,.5); transform:translate(-50%,-50%); transition:transform 320ms var(--goom-move),background 320ms ease,box-shadow 320ms ease; }
+.formula-node[aria-selected="true"] i { background:var(--f-accent,#f45f2b); box-shadow:0 0 0 5px rgba(244,95,43,.2); transform:translate(-50%,-50%) scale(1.34); }
+.formula-node span { position:absolute; left:50%; top:30px; color:rgba(43,23,103,.62); font-size:clamp(9px,.82vw,12px); font-weight:500; letter-spacing:.16em; white-space:nowrap; text-transform:uppercase; transform:translateX(-50%); transition:color 320ms ease; }
+.formula-node[aria-selected="true"] span { color:var(--f-accent-ink,#a33512); }
+.formula-track { padding-bottom:26px; }
+
+/* Restored original brand section. */
+.gh-brand {
+  --gh-ink:#2b1767;
+  --gh-muted:#776c85;
+  --gh-paper:#fff8ea;
+  --gh-line:#dccfbe;
+  --gh-orange:#ed6b3f;
+  --gh-page:clamp(22px,5.5vw,88px);
+  position:relative;
+  overflow:clip;
+  padding-block:clamp(100px,10vw,160px);
+  color:var(--gh-ink);
+  background:var(--gh-paper);
+}
+.gh-container { width:min(100%,1440px); margin-inline:auto; padding-inline:var(--gh-page); }
+.gh-brand h2,.gh-brand p,.gh-brand figure { margin:0; }
+.gh-eyebrow { display:block; margin-bottom:18px; font-size:12px; font-weight:500; letter-spacing:.11em; text-transform:uppercase; }
+.gh-brand-statement { position:relative; padding-bottom:76px; }
+.gh-brand-statement h2 { max-width:1120px; font-size:clamp(52px,7.4vw,112px); font-weight:500; line-height:.92; letter-spacing:-.055em; }
+.gh-brand-statement h2 span { color:var(--gh-orange); }
+.gh-brand-signature { position:absolute; left:0; bottom:75px; color:var(--gh-ink); font-size:19px; font-weight:900; line-height:1.05; transform:rotate(-8deg); }
+.gh-brand-grid { display:grid; grid-template-columns:1.08fr .82fr; align-items:start; gap:9%; }
+.gh-brand-photo { position:sticky; top:100px; min-height:690px; }
+.gh-brand-photo video { display:block; width:100%; height:650px; object-fit:cover; border-radius:120px 28px 120px 28px; background:#d9c8ef; }
+.gh-brand-photo>img { position:absolute; left:-34px; bottom:34px; width:190px; height:235px; object-fit:cover; border:10px solid var(--gh-paper); border-radius:90px 20px 90px 20px; transform:rotate(-7deg); }
+.gh-brand-photo figcaption { margin-top:16px; color:var(--gh-muted); font-size:12px; }
+.gh-brand-copy { padding-top:20px; }
+.gh-brand-copy p { max-width:520px; margin-bottom:34px; font-size:clamp(18px,1.55vw,23px); line-height:1.7; }
+.gh-brand-copy .gh-lead { margin-bottom:42px; color:var(--gh-orange); font-size:clamp(29px,3vw,46px); line-height:1.25; }
+.gh-brand-finale { padding-top:34px; border-top:1px solid var(--gh-line); }
+.gh-brand-finale strong { font-size:1.45em; font-weight:500; }
+.gh-text-link { display:inline-flex; align-items:center; gap:18px; padding-block:8px; border-bottom:1px solid currentColor; color:inherit; font-size:15px; font-weight:500; }
+.gh-icon { width:19px; height:19px; flex-shrink:0; transition:transform 200ms ease; }
+
+/* Testimonial ring — the rotating 3D carousel, built on the reference technique. */
+#stories { position:relative; overflow:hidden; padding:clamp(62px,7vw,100px) 0 clamp(58px,6vw,90px); color:#fff; background:radial-gradient(96% 72% at 50% 56%,#46237e 0%,#24124f 48%,#0f0729 100%); }
+#stories>div { position:relative; z-index:2; }
+.stories-head { display:flex; flex-wrap:wrap; align-items:flex-end; justify-content:space-between; gap:20px 40px; max-width:1320px; margin:0 auto; padding:0 clamp(20px,5vw,80px); }
+#stories h2 { max-width:11em; margin:0; color:#fff; font-size:clamp(34px,4.2vw,60px); font-weight:500; line-height:1.02; letter-spacing:-.045em; }
+#stories .stories-sub { max-width:34ch; margin:0 0 6px; color:rgba(255,255,255,.6); font-size:clamp(14px,1.05vw,16px); line-height:1.6; text-align:left; }
+
+/* Reference technique: perspective scene + preserve-3d ring + per-card rotateY/translateZ. */
+.stories-scene {
+  display:grid;
+  overflow:hidden;
+  height:clamp(400px,52vh,560px);
+  margin-top:clamp(24px,3vw,44px);
+  font-size:clamp(11px,1.05vw,16px);
+  perspective:35em;
+  -webkit-mask-image:linear-gradient(90deg,transparent,#000 25%,#000 75%,transparent);
+  mask-image:linear-gradient(90deg,transparent,#000 25%,#000 75%,transparent);
+}
+.stories-ring {
+  display:grid;
+  place-self:center;
+  transform-style:preserve-3d;
+  will-change:transform;
+  transition:transform 520ms var(--goom-move);
+}
+.stories-ring.is-free { transition:none; }
+.stories-card {
+  --w:17.5em;
+  --ba:calc(1turn / var(--n));
+  grid-area:1/1;
+  width:var(--w);
+  aspect-ratio:7/10;
+  padding:0;
+  border:0;
+  border-radius:1.5em;
+  overflow:hidden;
+  background:#1b0f45;
+  box-shadow:0 26px 60px rgba(6,2,24,.5);
+  backface-visibility:hidden;
+  cursor:pointer;
+  transform:
+    rotateY(calc(var(--i) * var(--ba)))
+    translateZ(calc(-1 * (.5 * var(--w) + .55em) / tan(.5 * var(--ba))));
+}
+.stories-card video,.stories-card img { display:block; width:100%; height:100%; object-fit:cover; }
+.stories-card .story-play {
+  position:absolute;
+  inset:auto 0 0 0;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:14px 16px;
+  background:linear-gradient(transparent,rgba(9,4,30,.78));
+  color:#fff;
+  font-size:.82em;
+  font-weight:500;
+  text-align:start;
+  opacity:0;
+  transition:opacity 260ms var(--goom-ease);
+}
+.stories-card { position:relative; }
+.stories-card:hover .story-play,.stories-card:focus-visible .story-play { opacity:1; }
+.stories-controls { display:flex; align-items:center; justify-content:center; gap:12px; margin-top:clamp(22px,2.6vw,34px); }
+.stories-arrow { display:grid; place-items:center; width:52px; height:52px; border:1px solid rgba(255,255,255,.34); border-radius:50%; background:rgba(255,255,255,.07); color:#fff; font-size:20px; cursor:pointer; backdrop-filter:blur(10px); transition:background 180ms ease,transform 140ms var(--goom-ease); }
+.stories-arrow:active { transform:scale(.94); }
+.stories-pause { padding:13px 22px; border:1px solid rgba(255,255,255,.34); border-radius:99px; background:transparent; color:#fff; font-size:13px; font-weight:500; cursor:pointer; transition:background 180ms ease; }
+#stories [data-stage3d] { opacity:0; transform:translateY(34px); transition:opacity 800ms var(--goom-ease),transform 800ms var(--goom-ease); }
+#stories.is-in-view [data-stage3d] { opacity:1; transform:translateY(0); }
+
+.press-section { background:#fff; padding:clamp(56px,7vw,96px) 0; overflow:hidden; }
+.press-section>p { margin:0 0 clamp(28px,4vw,52px); text-align:center; font-size:clamp(22px,2.4vw,34px); font-weight:900; letter-spacing:-.02em; }
+.press-mask { position:relative; direction:ltr; mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent); -webkit-mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent); }
+.press-track { display:flex; direction:ltr; width:max-content; animation:goomMarqueeA 42s linear infinite; }
+.press-mask:hover .press-track,
+.press-mask:focus-within .press-track,
+.community-rows:hover .community-track,
+.community-rows:focus-within .community-track { animation-play-state:paused; }
+.press-logo { display:grid; place-items:center; width:clamp(130px,13vw,190px); height:74px; padding:0 10px; flex:none; }
+.press-logo img { max-width:100%; max-height:52px; width:auto; height:auto; object-fit:contain; }
+
+.community-section { background:#f7f1e8; padding:clamp(64px,8vw,110px) 0; overflow:hidden; }
+.community-head { padding:0 clamp(18px,5vw,84px); max-width:1320px; margin:0 auto clamp(32px,4vw,56px); }
+.community-head h2 { margin:0; font-size:clamp(32px,4.2vw,62px); font-weight:900; letter-spacing:-.03em; line-height:1.06; }
+.community-head p { margin:18px 0 0; font-size:clamp(15px,1.25vw,18px); color:#6b6046; max-width:38em; }
+.community-rows { display:grid; direction:ltr; justify-items:start; gap:clamp(12px,1.6vw,22px); mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent); -webkit-mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent); }
+.community-track { display:flex; direction:ltr; gap:clamp(12px,1.6vw,22px); width:max-content; }
+.community-track:first-child { animation:goomMarqueeA 58s linear infinite; }
+.community-track:last-child { animation:goomMarqueeB 64s linear infinite; }
+.community-track img { width:clamp(190px,20vw,290px); aspect-ratio:4/5; object-fit:cover; border-radius:20px; flex:none; display:block; }
+
+.final-cta { position:relative; background:linear-gradient(150deg,#d6c6ea,#c4b0de); padding:clamp(72px,9vw,130px) clamp(18px,5vw,84px); overflow:hidden; }
+.final-cta-inner { max-width:1320px; margin-inline:auto; display:grid; grid-template-columns:minmax(0,1fr) minmax(0,.9fr); gap:clamp(24px,4vw,64px); align-items:center; }
+.final-cta h2 { margin:0; font-size:clamp(34px,4.8vw,74px); font-weight:900; letter-spacing:-.035em; line-height:1.05; }
+.final-cta p { margin:20px 0 0; font-size:clamp(16px,1.3vw,19px); color:#3f3170; max-width:30em; }
+.final-cta-actions { display:flex; flex-wrap:wrap; gap:14px; margin-top:32px; }
+.final-button { display:inline-flex; align-items:center; min-height:54px; padding:14px 30px; border-radius:999px; background:#2e2170; color:#fff; font-size:16px; font-weight:500; }
+.final-button.alt { background:transparent; color:#2e2170; border:1px solid rgba(46,33,112,.4); }
+.final-art { position:relative; min-height:clamp(280px,34vw,440px); }
+.final-art img { position:absolute; left:50%; top:50%; width:min(100%,520px); transform:translate(-50%,-50%); --rot:0deg; animation:goomFloat 8s ease-in-out infinite; }
+
+.goom-footer { background:#2e2170; color:#ede7fa; padding:clamp(52px,6vw,84px) clamp(18px,5vw,84px) 40px; }
+.footer-grid { max-width:1320px; margin-inline:auto; display:grid; grid-template-columns:1.2fr repeat(3,minmax(0,1fr)); gap:clamp(24px,3vw,48px); }
+.footer-grid img { width:132px; height:auto; }
+.footer-grid p { margin:18px 0 0; font-size:14px; opacity:.75; max-width:24em; }
+.footer-col>p { margin:0 0 14px; font-size:13px; letter-spacing:.1em; opacity:.6; }
+.footer-col div { display:grid; gap:9px; font-size:14px; }
+.footer-col a { color:#ede7fa; }
+.goom-footer>p { max-width:1320px; margin:clamp(34px,4vw,56px) auto 0; font-size:12px; opacity:.55; }
+
+[data-reveal]:not(.how-card) { opacity:0; transform:translate3d(0,34px,0); transition:opacity 700ms var(--goom-ease),transform 700ms var(--goom-ease); }
+[data-reveal]:not(.how-card).is-visible { opacity:1; transform:translate3d(0,0,0); }
+
+@media (hover:hover) and (pointer:fine) {
+  .gh-text-link:hover .gh-icon { transform:translateX(-5px); }
+  .stories-arrow:hover { background:rgba(255,255,255,.2); }
+  .final-button:hover { color:#fff; transform:translateY(-2px); }
+}
+
+@media (max-width:900px) {
+  .goom-nav { display:none; }
+  .goom-menu { display:grid; }
+  .goom-bar { padding-inline:18px 8px; }
+  /* portrait: the film goes full-bleed too, copy sits over a scrim at the foot */
+  .hero-pin { display:block; padding:0; }
+  .hero-film { position:absolute; inset:0; width:auto; aspect-ratio:auto; transform:scale(calc(1 + var(--p) * .04)); }
+  .hero-film::before { display:none; }
+  .hero-canvas,.hero-poster { object-position:56% 26%; }
+  /* the copy carries its own ground so it can never land on a product */
+  .hero-copy[data-scene="1"] {
+    position:absolute;
+    inset:auto 0 0 0;
+    z-index:4;
+    width:auto;
+    padding:clamp(56px,9vh,96px) clamp(20px,5vw,40px) clamp(34px,5vh,58px);
+    text-align:right;
+    background:linear-gradient(0deg,#cbbbe6 0,#cbbbe6 64%,rgba(203,187,230,0));
+    transform:translateY(16px);
+  }
+  /* must match the desktop .is-on specificity to beat translateY(-50%) */
+  .hero-copy[data-scene="1"].is-on { transform:none; }
+  .hero-wordmark { display:none; }
+  .hero-copy h1,.hero-copy h2 { font-size:clamp(28px,4.4vw,40px); }
+  .gh-brand-grid { grid-template-columns:1fr; gap:60px; }
+  .gh-brand-photo { position:relative; top:auto; min-height:620px; }
+  .gh-brand-photo video { height:580px; }
+  /* portrait stacks the copy over the busiest part of the plate — ground it */
+  .how-grid { grid-template-columns:1fr; }
+  .faq-inner { grid-template-columns:1fr; gap:36px; }
+  .final-cta-inner { grid-template-columns:1fr; }
+  .footer-grid { grid-template-columns:1fr 1fr; }
+  .formula-head {
+    inset:0;
+    width:auto;
+    display:flex;
+    flex-direction:column;
+    padding:clamp(78px,11vh,110px) clamp(18px,5vw,30px) clamp(92px,13vh,120px);
+    transform:none;
+    pointer-events:none;
+  }
+  .formula-head h2 { font-size:clamp(23px,6.2vw,33px); }
+  .formula-head .f-rule { display:none; }
+  .formula-head .f-eyebrow { margin-bottom:10px; }
+  .formula-caption { min-height:0; margin-top:auto; }
+  .formula-caption ul { display:none; }
+  .formula-caption h3 { font-size:clamp(22px,6vw,30px); }
+  .formula-caption p { margin-top:8px; font-size:14px; }
+  .formula-caption .f-cta { margin-top:16px; pointer-events:auto; }
+  .formula-stage { inset:0; perspective:900px; perspective-origin:50% 50%; }
+  .formula-item { top:47%; width:clamp(126px,33vw,172px); }
+  .formula-node span { display:none; }
+  .formula-track { padding-bottom:0; }
+  .formula-blob svg { width:190vw; }
+}
+
+@media (max-width:639px) {
+  .goom-header { inset:10px 0 auto 0; }
+  .goom-brand img { height:23px; }
+  .goom-bar-cta { display:none; }
+  .hero { height:200dvh; }
+  .hero-copy h1,.hero-copy h2 { font-size:clamp(28px,7.6vw,38px); }
+  .hero-copy p { font-size:15px; }
+  .hero-actions { gap:10px; }
+  .hero-btn { min-height:48px; padding:12px 22px; font-size:14px; }
+  .hero-cue { display:none; }
+  #stories { padding-block:60px 70px; }
+  .stories-head { padding-inline:22px; }
+  #stories h2 { max-width:9em; font-size:clamp(30px,8.6vw,44px); }
+  #stories .stories-sub { text-align:right; }
+  .stories-scene { height:clamp(230px,30vh,290px); font-size:12px; }
+  .stories-card .story-play { font-size:1.05em; padding:10px 12px; }
+  .stories-controls { gap:10px; margin-top:20px; }
+  .stories-arrow { width:46px; height:46px; }
+  .gh-brand { padding-block:90px; }
+  .gh-brand-statement { padding-bottom:50px; }
+  .gh-brand-statement h2 { font-size:49px; }
+  .gh-brand-signature { display:none; }
+  .gh-brand-photo { min-height:505px; }
+  .gh-brand-photo video { height:480px; border-radius:70px 20px 70px 20px; }
+  .gh-brand-photo>img { left:-8px; bottom:14px; width:125px; height:160px; border-width:7px; }
+  .gh-brand-copy p { font-size:18px; }
+  .community-rows { gap:12px; }
+  .footer-grid { grid-template-columns:1fr 1fr; }
+  .footer-grid>div:first-child { grid-column:1/-1; }
+}
+
+@media (prefers-reduced-motion:reduce) {
+  html { scroll-behavior:auto; }
+  *,*::before,*::after { animation-duration:.01ms!important; animation-iteration-count:1!important; }
+  [data-reveal],.how-card { opacity:1; transform:none; transition:none; }
+  .hero { height:100dvh; }
+  .hero-cue { display:none; }
+  .goom-bar::after { display:none; }
+  .formula-item,.formula-caption-inner,.formula-track-fill,.formula-blob svg,.stories-ring,.gh-icon { transition:none; }
+}
+
+</style>
+</helmet>
+
+<div class="goom-page" dir="rtl">
+  <header class="goom-header" data-header>
+    <div class="goom-bar">
+      <a class="goom-brand" href="#top" aria-label="GOOM — חזרה להתחלה"><img src="assets/logo.png" alt="GOOM"></a>
+      <nav class="goom-nav" aria-label="ניווט ראשי">
+        <a href="#formulas">המוצרים</a>
+        <a href="#how">איך זה עובד</a>
+        <a href="#stories">המלצות</a>
+        <a href="#about">אודות</a>
+        <a href="#faq">שאלות ותשובות</a>
+      </nav>
+      <a class="goom-bar-cta" href="#formulas">מצאו את הפורמולה</a>
+      <button class="goom-menu" type="button" aria-label="תפריט"><i></i><i></i></button>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero" data-hero aria-labelledby="hero-title">
+      <div class="hero-pin">
+        <div class="hero-film" aria-hidden="true">
+          <img class="hero-poster" src="assets/film/f00.jpg" alt="" decoding="async">
+          <canvas class="hero-canvas" data-hero-canvas width="1280" height="720"></canvas>
+          <span class="hero-matte hero-matte-tr"></span>
+        </div>
+
+        <div class="hero-copy" data-scene="1">
+          <span class="hero-wordmark" aria-hidden="true">GO<br>OM</span>
+          <h1 id="hero-title">הטוב שלך, בגומי.</h1>
+          <p class="hero-sub" dir="ltr">FEEL GOOD. GO GOOM.</p>
+          <p>תוספי תזונה מדויקים בגומי — סדרה שנכנסת לשגרה שלך בלי מאמץ, ובלי כוס מים.</p>
+          <div class="hero-actions">
+            <a class="hero-btn" href="#formulas">מצאו את הפורמולה שלכם</a>
+            <a class="hero-btn ghost" href="#how">איך זה עובד</a>
+          </div>
+        </div>
+
+        <span class="hero-cue" aria-hidden="true">SCROLL<i></i></span>
+      </div>
+    </section>
+
+    <section class="formula" id="formulas" data-formula tabindex="-1" aria-labelledby="formula-title">
+      <div class="formula-pin">
+        <div class="formula-blob" aria-hidden="true">
+          <img class="formula-plate" src="assets/bg-b.jpg" alt="" decoding="async">
+        </div>
+
+        <div class="formula-stage">
+          <div class="formula-rail" data-formula-rail></div>
+        </div>
+
+        <div class="formula-head">
+          <span class="f-eyebrow">THE GOOM FORMULAS</span>
+          <h2 id="formula-title">הפורמולה שמתאימה<br>לשגרה שלך.</h2>
+          <div class="f-rule" aria-hidden="true"></div>
+          <div class="formula-caption" data-formula-caption aria-live="polite"></div>
+        </div>
+
+        <div class="formula-arrows">
+          <button class="formula-arrow" type="button" data-f-prev aria-label="הפורמולה הקודמת">&#8250;</button>
+          <button class="formula-arrow" type="button" data-f-next aria-label="הפורמולה הבאה">&#8249;</button>
+        </div>
+
+        <div class="formula-track" dir="ltr" data-formula-track>
+          <div class="formula-track-line"><span class="formula-track-fill" data-track-fill></span>
+            <div class="formula-nodes" role="tablist" aria-label="בחירת פורמולה"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="how" id="how" aria-labelledby="how-title">
+      <div class="how-inner">
+        <div class="how-head" data-reveal>
+          <div>
+            <span class="f-eyebrow">HOW IT WORKS</span>
+            <h2 id="how-title">שלושה צעדים, ובערך<br>שלושים שניות.</h2>
+          </div>
+          <p>בלי תוכניות, בלי טבלאות ובלי להתחיל ביום ראשון. בוחרים מה חשוב לך עכשיו, ומשם זה כמעט מתנהל לבד.</p>
+        </div>
+        <div class="how-grid">
+          <article class="how-card" data-reveal>
+            <span class="how-step">01</span>
+            <h3>בוחרים מטרה</h3>
+            <p>עיכול, אנרגיה, שיער ועור, זוהר או שינה. מתחילים מהדבר שהכי מציק — לא מרשימת קניות.</p>
+          </article>
+          <article class="how-card" data-reveal>
+            <span class="how-step">02</span>
+            <h3>מקבלים פורמולה</h3>
+            <p>כל פורמולה מרוכזת בגומי אחד: מינון מדויק, בלי כדורים ובלי כוס מים לידה.</p>
+          </article>
+          <article class="how-card" data-reveal>
+            <span class="how-step">03</span>
+            <h3>גומי אחד ביום</h3>
+            <p>בבוקר עם הקפה או בערב לפני השינה. זה נכנס לשגרה מעצמו — וזה כל הרעיון.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="stories" aria-labelledby="stories-title">
+      <div class="stories-head" data-reveal>
+        <h2 id="stories-title">אנשים אמיתיים.<br>המלצות אמיתיות.</h2>
+        <p class="stories-sub">הטבעת מסתובבת לבד.<br>עצרו עליה, ולחצו על מי שתרצו לשמוע.</p>
+      </div>
+
+      <div data-stage3d>
+        <div class="stories-scene" dir="ltr" data-stories-scene>
+          <div class="stories-ring" data-ring3d style="--n:12">
+          <button class="stories-card" data-slot style="--i:0"><video src="assets/adar-story.mp4" poster="assets/stories/noa-poster-sm.jpg" preload="none" muted loop playsinline></video><span class="story-play"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>נועה · הבוקר שלי סוף סוף רגוע</span></button>
+          <button class="stories-card" data-slot style="--i:1"><video src="assets/brand-story.mp4" poster="assets/stories/adar-poster-sm.jpg" preload="none" muted loop playsinline></video><span class="story-play"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>אדר · לקח לי שבועיים להרגיש את זה</span></button>
+          <button class="stories-card" data-slot style="--i:2"><video src="assets/guy-story.mp4" poster="assets/stories/shir-poster-sm.jpg" preload="none" muted loop playsinline></video><span class="story-play"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>שיר · טעים מדי בשביל ויטמין</span></button>
+          <button class="stories-card" data-slot style="--i:3"><video src="assets/guy-story.mp4" poster="assets/stories/guy-poster-sm.jpg" preload="none" muted loop playsinline></video><span class="story-play"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>גיא · נכנס לשגרה בלי מאמץ</span></button>
+          <button class="stories-card" data-slot style="--i:4"><video src="assets/brand-story.mp4" poster="assets/stories/elia-poster-sm.jpg" preload="none" muted loop playsinline></video><span class="story-play"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>אליה · העור שלי אמר תודה</span></button>
+          <button class="stories-card" data-slot style="--i:5"><video src="assets/adar-story.mp4" poster="assets/stories/doctor-poster-sm.jpg" preload="none" muted loop playsinline></video><span class="story-play"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>ד"ר רון · ההרכב פה באמת מדויק</span></button>
+          <button class="stories-card" data-slot style="--i:6"><video src="assets/adar-story.mp4" poster="assets/stories/noa-poster-sm.jpg" preload="none" muted loop playsinline></video><span class="story-play"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>נועה · הבוקר שלי סוף סוף רגוע</span></button>
+          <button class="stories-card" data-slot style="--i:7"><video src="assets/brand-story.mp4" poster="assets/stories/adar-poster-sm.jpg" preload="none" muted loop playsinline></video><span class="story-play"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>אדר · לקח לי שבועיים להרגיש את זה</span></button>
+          <button class="stories-card" data-slot style="--i:8"><video src="assets/guy-story.mp4" poster="assets/stories/shir-poster-sm.jpg" preload="none" muted loop playsinline></video><span class="story-play"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>שיר · טעים מדי בשביל ויטמין</span></button>
+          <button class="stories-card" data-slot style="--i:9"><video src="assets/guy-story.mp4" poster="assets/stories/guy-poster-sm.jpg" preload="none" muted loop playsinline></video><span class="story-play"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>גיא · נכנס לשגרה בלי מאמץ</span></button>
+          <button class="stories-card" data-slot style="--i:10"><video src="assets/brand-story.mp4" poster="assets/stories/elia-poster-sm.jpg" preload="none" muted loop playsinline></video><span class="story-play"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>אליה · העור שלי אמר תודה</span></button>
+          <button class="stories-card" data-slot style="--i:11"><video src="assets/adar-story.mp4" poster="assets/stories/doctor-poster-sm.jpg" preload="none" muted loop playsinline></video><span class="story-play"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>ד"ר רון · ההרכב פה באמת מדויק</span></button>
+          </div>
+        </div>
+        <div class="stories-controls">
+          <button class="stories-arrow" data-arrow="prev" type="button" aria-label="הקודם">&#8249;</button>
+          <button class="stories-pause" data-spin-toggle type="button" aria-pressed="false">עצירת הסיבוב</button>
+          <button class="stories-arrow" data-arrow="next" type="button" aria-label="הבא">&#8250;</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="about" class="gh-brand" aria-labelledby="brand-title">
+      <div class="gh-container">
+        <header class="gh-brand-statement" data-reveal>
+          <span class="gh-eyebrow">THIS IS YOUR SIGN</span>
+          <h2 id="brand-title">מעולם לא היה קל יותר<br>להשקיע <span>בעצמך.</span></h2>
+          <span class="gh-brand-signature" dir="ltr">FEEL GOOD.<br>GO GOOM.</span>
+        </header>
+        <div class="gh-brand-grid">
+          <figure class="gh-brand-photo" data-reveal>
+            <video src="assets/brand-story.mp4" poster="assets/quality-lifestyle.jpg" muted loop autoplay playsinline preload="metadata" aria-label="רגעים מהעולם של GOOM"></video>
+            <img src="assets/quality-lifestyle.jpg" alt="רגע קטן בשגרת GOOM" loading="lazy">
+            <figcaption>החלטה קטנה. מקום גדול לעצמכם.</figcaption>
+          </figure>
+          <div class="gh-brand-copy">
+            <p class="gh-lead" data-reveal>זה לא סתם סלוגן.<br>זה ה״אני מאמין״ שלנו.</p>
+            <p data-reveal>לא צריך לחכות ל״אחרי החגים״, לשבוע הבא, לשנה החדשה או לשינוי גדול בחיים. רוב הפעמים זה מתחיל בהחלטה אחת קטנה.</p>
+            <p data-reveal>אנחנו ב־GOOM מאמינים שההחלטה הזאת צריכה להיות כמה שיותר פשוטה. לכן פיתחנו תוספי תזונה מיוחדים — בגומי.</p>
+            <p data-reveal>סדרה איכותית, מדויקת, טעימה ובסטנדרט הגבוה ביותר, שנכנסת בקלות לשגרה שלך — בלי לחץ ובלי דרישות מוגזמות.</p>
+            <p data-reveal>וכל זה מתוך מטרה אחת: לעזור לך להרגיש טוב מבפנים החוצה, כל יום מחדש.</p>
+            <p class="gh-brand-finale" data-reveal>לא צריך תירוץ כדי להשקיע בעצמך.<br><strong>הזמן הכי טוב הוא עכשיו.</strong></p>
+            <a class="gh-text-link" href="#top">למציאת הפורמולה שלך <svg class="gh-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M19 12H5m6-6-6 6 6 6"></path></svg></a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="press" class="press-section">
+      <p data-reveal>בטח ראיתם אותנו גם ב</p>
+      <div class="press-mask"><div class="press-track">
+        <span class="press-logo"><img src="assets/press/press-reshet.png" alt="רשת 13"></span><span class="press-logo"><img src="assets/press/press-7.png" alt="ערוץ 7"></span><span class="press-logo"><img src="assets/press/press-maariv.png" alt="מעריב"></span><span class="press-logo"><img src="assets/press/press-terminalx.png" alt="Terminal X"></span><span class="press-logo"><img src="assets/press/press-5.webp" alt="BIO גאיה"></span><span class="press-logo"><img src="assets/press/press-israelhayom.png" alt="ישראל היום"></span><span class="press-logo"><img src="assets/press/press-14.svg" alt="ערוץ 14"></span><span class="press-logo"><img src="assets/press/press-hitechzone.webp" alt="Hitech Zone"></span>
+        <span class="press-logo"><img src="assets/press/press-reshet.png" alt=""></span><span class="press-logo"><img src="assets/press/press-7.png" alt=""></span><span class="press-logo"><img src="assets/press/press-maariv.png" alt=""></span><span class="press-logo"><img src="assets/press/press-terminalx.png" alt=""></span><span class="press-logo"><img src="assets/press/press-5.webp" alt=""></span><span class="press-logo"><img src="assets/press/press-israelhayom.png" alt=""></span><span class="press-logo"><img src="assets/press/press-14.svg" alt=""></span><span class="press-logo"><img src="assets/press/press-hitechzone.webp" alt=""></span>
+      </div></div>
+    </section>
+
+    <section id="community" class="community-section">
+      <div class="community-head" data-reveal><h2>טעימה קטנה<br>מהקהילה שלנו</h2><p>אלפי אנשים כבר הכניסו את GOOM לשגרה שלהם. אלה הרגעים שהם משתפים איתנו.</p></div>
+      <div class="community-rows">
+        <div class="community-track"><img src="assets/social/social-17-sm.jpg" alt=""><img src="assets/social/social-18-sm.jpg" alt=""><img src="assets/social/social-20-sm.jpg" alt=""><img src="assets/social/social-22-sm.jpg" alt=""><img src="assets/social/quality-lifestyle-sm.jpg" alt=""><img src="assets/social/community-current-sm.jpg" alt=""><img src="assets/social/wellness-hero.png" alt=""><img src="assets/social/social-17-sm.jpg" alt=""><img src="assets/social/social-18-sm.jpg" alt=""><img src="assets/social/social-20-sm.jpg" alt=""><img src="assets/social/social-22-sm.jpg" alt=""><img src="assets/social/quality-lifestyle-sm.jpg" alt=""><img src="assets/social/community-current-sm.jpg" alt=""><img src="assets/social/wellness-hero.png" alt=""></div>
+        <div class="community-track"><img src="assets/stories/noa-poster-sm.jpg" alt=""><img src="assets/stories/adar-poster-sm.jpg" alt=""><img src="assets/stories/shir-poster-sm.jpg" alt=""><img src="assets/stories/guy-poster-sm.jpg" alt=""><img src="assets/stories/elia-poster-sm.jpg" alt=""><img src="assets/stories/doctor-poster-sm.jpg" alt=""><img src="assets/stories/noa-poster-sm.jpg" alt=""><img src="assets/stories/adar-poster-sm.jpg" alt=""><img src="assets/stories/shir-poster-sm.jpg" alt=""><img src="assets/stories/guy-poster-sm.jpg" alt=""><img src="assets/stories/elia-poster-sm.jpg" alt=""><img src="assets/stories/doctor-poster-sm.jpg" alt=""></div>
+      </div>
+    </section>
+
+    <section class="faq" id="faq" aria-labelledby="faq-title">
+      <div class="faq-inner">
+        <div class="faq-head" data-reveal>
+          <span class="f-eyebrow">FAQ</span>
+          <h2 id="faq-title">שאלות שחוזרות אצלנו הכי הרבה.</h2>
+          <p>לא מצאת את מה שחיפשת? כתבו לנו ונחזור אליכם, בדרך כלל באותו יום.</p>
+          <a href="https://goom.co.il/pages/contact">לדבר איתנו</a>
+        </div>
+        <div class="faq-list" data-faq>
+          <div class="faq-item">
+            <button class="faq-q" type="button" data-faq-q aria-expanded="false"><span>תוך כמה זמן מרגישים משהו?</span><span aria-hidden="true"></span></button>
+            <div class="faq-a"><div><p>זה משתנה בין אדם לאדם ובין פורמולה לפורמולה. רוב האנשים מדווחים על תחושה ברורה אחרי שבועיים עד ארבעה שבועות של שימוש עקבי. Deep Sleep נוטה להיות מורגש מהר יותר, ו־Shine דורש את הסבלנות הכי גדולה.</p></div></div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-q" type="button" data-faq-q aria-expanded="false"><span>אפשר לשלב כמה פורמולות יחד?</span><span aria-hidden="true"></span></button>
+            <div class="faq-a"><div><p>כן, והרבה אנשים עושים את זה — למשל Flow בבוקר ו־Deep Sleep בערב. אם את בהיריון, מניקה, נוטלת תרופות קבועות או מטפלת בילד, כדאי לעבור על ההרכב עם רופא לפני שמשלבים.</p></div></div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-q" type="button" data-faq-q aria-expanded="false"><span>יש סוכר בגומי?</span><span aria-hidden="true"></span></button>
+            <div class="faq-a"><div><p>הגומי מתוק, אבל הכמות קטנה ומדובר במינון של גומי אחד ביום. ההרכב המלא של כל פורמולה מודפס על הצנצנת ומופיע גם בעמוד המוצר, כולל רשימת האלרגנים.</p></div></div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-q" type="button" data-faq-q aria-expanded="false"><span>מאיזה גיל אפשר?</span><span aria-hidden="true"></span></button>
+            <div class="faq-a"><div><p>הפורמולות שלנו מיועדות לבני 18 ומעלה, אלא אם צוין אחרת על האריזה. תוסף תזונה אינו תחליף לתזונה מגוונת ומאוזנת.</p></div></div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-q" type="button" data-faq-q aria-expanded="false"><span>איך שומרים על הגומי?</span><span aria-hidden="true"></span></button>
+            <div class="faq-a"><div><p>במקום קריר ויבש, הרחק משמש ישירה, עם המכסה סגור. אין צורך בקירור. תאריך התפוגה מוטבע על תחתית הצנצנת.</p></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="final-cta">
+      <div class="final-cta-inner">
+        <div data-reveal><h2>הטוב שלך,<br>בגומי.</h2><p>בחרי מטרה, קבלי פורמולה. אפשר להתחיל מפורמולה אחת ולהמשיך למארז שמתאים לשגרה שלך.</p><div class="final-cta-actions"><a class="final-button" href="#top">לכל הפורמולות</a><a class="final-button alt" href="#community">לקהילת GOOM</a></div></div>
+        <div class="final-art" data-reveal><img src="assets/splash-flow.png" alt="Flow"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="goom-footer">
+    <div class="footer-grid">
+      <div><img src="assets/logo.png" alt="GOOM"><p>תוספי תזונה בגומי, מיוצרים בישראל. אינם תחליף לתזונה מאוזנת.</p></div>
+      <div class="footer-col"><p>ה־GOOM שלכם</p><div><a href="#top">כל הפורמולות</a><a href="#community">Wellness Club</a><a href="#stories">כל הביקורות</a></div></div>
+      <div class="footer-col"><p>נעים להכיר</p><div><a href="#about">הסיפור שלנו</a><a href="#press">עלינו בתקשורת</a><a href="#community">קהילת GOOM</a></div></div>
+      <div class="footer-col"><p>אנחנו כאן</p><div><a href="https://goom.co.il/pages/contact">צור קשר</a><a href="https://goom.co.il/pages/שאלות-תשובות">שאלות ותשובות</a><a href="https://goom.co.il/policies/privacy-policy">פרטיות</a></div></div>
+    </div>
+    <p>עמוד הדגמה. הרכישה אינה פעילה.</p>
+  </footer>
+</div>
+</x-dc>
+
+<script type="text/x-dc" data-dc-script data-props="{}">
+class Component extends DCLogic {
+  componentDidMount() {
+    this.reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    this.header = document.querySelector('[data-header]');
+    this.hero = document.querySelector('[data-hero]');
+    this.destroyed = false;
+
+    this.onScroll = () => {
+      if (this.raf) return;
+      this.raf = requestAnimationFrame(() => { this.raf = 0; this.updateScroll(); });
+    };
+    window.addEventListener('scroll', this.onScroll, { passive:true });
+    window.addEventListener('resize', this.onScroll);
+
+    this.initReveals();
+    this.initHero();
+    this.initFormula();
+    this.initStories();
+    this.initFaq();
+    this.updateScroll();
+  }
+
+  componentWillUnmount() {
+    this.destroyed = true;
+    window.removeEventListener('scroll', this.onScroll);
+    window.removeEventListener('resize', this.onScroll);
+    cancelAnimationFrame(this.raf);
+    cancelAnimationFrame(this.storyRaf);
+    clearTimeout(this.captionTimer);
+    this.revealObserver?.disconnect();
+    this.storyObserver?.disconnect();
+    if (this.layoutFormula) window.removeEventListener('resize', this.layoutFormula);
+    if (this.onHeroPointer) window.removeEventListener('pointermove', this.onHeroPointer);
+    cancelAnimationFrame(this.paintRaf);
+    this.frames?.forEach(b => b?.close?.());
+  }
+
+  clamp(value,min=0,max=1) { return Math.min(max,Math.max(min,value)); }
+
+  updateScroll() {
+    this.updateHero();
+    this.updateFormula?.();
+    this.header?.classList.toggle('is-scrolled', window.scrollY > 30);
+  }
+
+  /* Scroll scrubs the supplied film. The export is 50 clean keyframes, so
+     adjacent frames are cross-faded to turn 5fps of stills into continuous
+     motion instead of a visible step. */
+  async initFilm() {
+    this.canvas = document.querySelector('[data-hero-canvas]');
+    this.ctx = this.canvas?.getContext('2d', { alpha:false });
+    if (!this.canvas || !this.ctx || this.reduced) return;
+    this.N = 42;
+    this.fw = this.canvas.width;
+    this.fh = this.canvas.height;
+    this.filmT = 0;
+    this.shownFrame = -1;
+    this.frames = new Array(this.N);
+    this.ctx.imageSmoothingQuality = 'high';
+
+    /* Decoding on every draw is what made the scrub feel sluggish. Decode each
+       frame once up front; from then on a paint is a straight GPU blit. */
+    const load = async (i) => {
+      try {
+        const res = await fetch(`assets/film/f${String(i).padStart(2, '0')}.jpg`, { cache:'force-cache' });
+        const bmp = await createImageBitmap(await res.blob());
+        if (this.destroyed) return bmp.close?.();
+        this.frames[i] = bmp;
+        if (i === 0) { this.hero?.classList.add('is-film-ready'); this.paintFilm(); }
+      } catch (_) {}
+    };
+    await load(0);
+    for (let i = 1; i < this.N; i += 4) {
+      await Promise.all([load(i), load(i + 1), load(i + 2), load(i + 3)].slice(0, Math.min(4, this.N - i)));
+      this.paintFilm();
+    }
+  }
+
+  paintFilm() {
+    if (!this.ctx || !this.frames) return;
+    const want = Math.round(this.clamp(this.filmT, 0, this.N - 1));
+    if (want === this.shownFrame) return;
+    let i = want;
+    while (i >= 0 && !this.frames[i]) i--;          // fall back to the newest frame already decoded
+    if (i < 0) return;
+    this.ctx.drawImage(this.frames[i], 0, 0, this.fw, this.fh);
+    this.shownFrame = want;
+  }
+
+  initHero() {
+    this.initFilm();
+    if (!this.hero || this.reduced) return;
+    this.onHeroPointer = (event) => {
+      const x = (event.clientX / window.innerWidth - 0.5) * 2;
+      const y = (event.clientY / window.innerHeight - 0.5) * 2;
+      this.hero.style.setProperty('--mx', x.toFixed(3));
+      this.hero.style.setProperty('--my', y.toFixed(3));
+    };
+    window.addEventListener('pointermove', this.onHeroPointer, { passive:true });
+  }
+
+  updateHero() {
+    if (!this.hero || this.reduced) return;
+    const span = Math.max(1, this.hero.offsetHeight - window.innerHeight);
+    const p = this.clamp(-this.hero.getBoundingClientRect().top / span);
+    this.hero.style.setProperty('--p', p.toFixed(4));
+    this.hero.classList.toggle('is-moving', p > 0.02);
+    if (!this.frames) return;
+    this.filmT = this.clamp(p) * (this.N - 1);
+    if (!this.paintRaf) this.paintRaf = requestAnimationFrame(() => { this.paintRaf = 0; this.paintFilm(); });
+    /* keyframe ranges of the film's three shots, read off the export */
+    const f = Math.round(this.filmT);
+    const scene = f <= 16 ? 1 : f >= 21 ? 2 : 0;
+    this.hero.classList.toggle('has-mark', f >= 17);   /* brand mark burns in from here on */
+    if (scene !== this.scene) {
+      this.scene = scene;
+      this.hero.classList.remove('s1', 's2', 's3');
+      if (scene) this.hero.classList.add('s' + scene);
+      this.copyBlocks = this.copyBlocks || [...document.querySelectorAll('.hero-copy')];
+      this.copyBlocks.forEach(el => el.classList.toggle('is-on', Number(el.dataset.scene) === scene));
+    }
+  }
+
+  initFaq() {
+    const list = document.querySelector('[data-faq]');
+    if (!list) return;
+    list.addEventListener('click', event => {
+      const button = event.target.closest('[data-faq-q]');
+      if (!button) return;
+      const item = button.parentElement;
+      const open = item.classList.toggle('is-open');
+      button.setAttribute('aria-expanded', String(open));
+      [...list.children].forEach(other => {
+        if (other === item) return;
+        other.classList.remove('is-open');
+        other.querySelector('[data-faq-q]')?.setAttribute('aria-expanded', 'false');
+      });
+    });
+  }
+
+  initReveals() {
+    const elements=[...document.querySelectorAll('[data-reveal]')];
+    if (this.reduced||!('IntersectionObserver' in window)) { elements.forEach(el=>el.classList.add('is-visible')); return; }
+    this.revealObserver=new IntersectionObserver((entries,observer)=>entries.forEach(entry=>{ if(!entry.isIntersecting)return; entry.target.classList.add('is-visible'); observer.unobserve(entry.target); }),{threshold:.1,rootMargin:'0px 0px -8% 0px'});
+    elements.forEach((el,index)=>{ if(!el.classList.contains('how-card')) el.style.transitionDelay=`${(index%4)*55}ms`; this.revealObserver.observe(el); });
+  }
+
+  /* ---------- Formula stage ---------- */
+  initFormula() {
+    const section = document.querySelector('[data-formula]');
+    if (!section) return;
+    const rail = section.querySelector('[data-formula-rail]');
+    const stage = section.querySelector('.formula-stage');
+    const caption = section.querySelector('[data-formula-caption]');
+    const nodes = section.querySelector('.formula-nodes');
+    const fill = section.querySelector('[data-track-fill]');
+    const blob = section.querySelector('.formula-plate');
+    if (!rail || !caption || !nodes || !fill) return;
+
+    this.formulas = [
+      { id:'b12', ink:'#8a5a00', img:'assets/p-b12.png', accent:'#e0a012', label:'B12+D3+B9', name:'B12+D3+B9',
+        kicker:'5-IN-1 · PASSION FRUIT',
+        line:'האנרגיה של היום־יום, בלי הצניחה של אחרי הצהריים.',
+        bullets:['B12, D3, B9, אבץ וברזל','60 גומיות בטעם פסיפלורה','גומי אחד ביום, בלי כוס מים'] },
+      { id:'grow', ink:'#175a86', img:'assets/p-grow.png', accent:'#2f9fe0', label:'Grow', name:'Grow',
+        kicker:'MEN · BERRY',
+        line:'ביוטין, אבץ ו־B12 לשיער, לעור ולציפורניים.',
+        bullets:['ביוטין + אבץ + B12','60 גומיות בטעם פירות יער','מותאם לשגרה של גברים'] },
+      { id:'flow', ink:'#a33512', img:'assets/flow-clean.png', accent:'#f45f2b', label:'Flow', name:'Flow',
+        kicker:'2-IN-1 · TUTTI FRUTTI',
+        line:'פרוביוטיקה וסיבים פרהביוטיים לעיכול מאוזן ולתחושת קלילות.',
+        bullets:['פרוביוטיקה + סיבים פרהביוטיים','60 גומיות בטעם טוטי פרוטי','הפורמולה הנמכרת ביותר שלנו'] },
+      { id:'shine', ink:'#8d1a14', img:'assets/p-shine.png', accent:'#e0342c', label:'Shine', name:'Shine',
+        kicker:'3-IN-1 · MIXED BERRIES',
+        line:'קולגן וחומצה היאלורונית לזוהר שרואים מבפנים החוצה.',
+        bullets:['קולגן + חומצה היאלורונית','40 גומיות בטעם פירות יער','משלים יפה את Flow'] },
+      { id:'sleep', ink:'#392c96', img:'assets/p-sleep.png', accent:'#5b4bd6', label:'Deep Sleep', name:'Deep Sleep',
+        kicker:'5-IN-1 · LAVENDER',
+        line:'מלטונין, מגנזיום ו־L־תיאנין ללילה שקט ולבוקר צלול.',
+        bullets:['מלטונין + L־תיאנין + מגנזיום','60 גומיות בטעם לבנדר','לקחת כחצי שעה לפני השינה'] }
+    ];
+
+    const total = this.formulas.length;
+    this.formulaActive = -1;
+    this.formulaItems = this.formulas.map((f, index) => {
+      const item = document.createElement('button');
+      item.type = 'button';
+      item.className = 'formula-item';
+      item.dataset.index = String(index);
+      item.setAttribute('aria-label', `הצגת פורמולת ${f.name}`);
+      item.innerHTML = `<img src="${f.img}" alt="${f.name}" loading="lazy" decoding="async">`;
+      item.addEventListener('click', () => this.goToFormula(index, true));
+      rail.appendChild(item);
+      return item;
+    });
+
+    this.formulaNodes = this.formulas.map((f, index) => {
+      const node = document.createElement('button');
+      node.type = 'button';
+      node.className = 'formula-node';
+      node.setAttribute('role', 'tab');
+      node.setAttribute('aria-label', f.name);
+      node.innerHTML = `<i></i><span>${f.label}</span>`;
+      node.addEventListener('click', () => this.goToFormula(index, true));
+      nodes.appendChild(node);
+      return node;
+    });
+    this.formulaFill = fill;
+    this.formulaCaption = caption;
+    this.formulaSection = section;
+    this.formulaStage = stage;
+    this.formulaBlob = blob;
+    this.formulaTotal = total;
+
+    /* Bottles ride a 3D ring: the active one faces front, the rest wrap around
+       the sides and back, so the group stays balanced whichever one is picked. */
+    this.layoutFormula = () => {
+      if (this.formulaActive < 0) return;
+      const width = stage ? stage.clientWidth : window.innerWidth;
+      const rx = Math.min(width * 0.42, 432);
+      const rz = 620;
+      const arc = (Math.PI * 2) / total;
+      this.formulaItems.forEach((item, index) => {
+        let offset = index - this.formulaActive;
+        offset -= Math.round(offset / total) * total;
+        const angle = offset * arc;
+        const distance = Math.abs(offset);
+        item.style.setProperty('--x', `${rx * Math.sin(angle)}px`);
+        item.style.setProperty('--y', `${distance * 13}px`);
+        item.style.setProperty('--z', `${rz * Math.cos(angle) - rz}px`);
+        item.style.setProperty('--ry', `${-offset * 15}deg`);
+        item.style.zIndex = String(30 - Math.round(distance * 10));
+        item.style.opacity = distance > 1.5 ? '.74' : '1';
+        item.classList.toggle('is-dim', distance > 0.5);
+      });
+    };
+
+    /* Scroll owns the index; the arrows and dots scroll to a beat so the two
+       controls can never disagree about where you are. */
+    this.goToFormula = (index, seek) => {
+      const next = Math.max(0, Math.min(total - 1, index));
+      if (seek && this.formulaSpan && !this.reduced) {
+        window.scrollTo({ top: Math.round(this.formulaSection.offsetTop + ((next + 0.5) / total) * this.formulaSpan), behavior:'smooth' });
+        return;
+      }
+      if (next === this.formulaActive) return;
+      const first = this.formulaActive < 0;
+      this.formulaActive = next;
+      const data = this.formulas[next];
+      section.style.setProperty('--f-accent', data.accent);
+      section.style.setProperty('--f-accent-ink', data.ink);
+      this.formulaNodes.forEach((node, i) => node.setAttribute('aria-selected', String(i === next)));
+      this.formulaFill.style.transform = `scaleX(${next / (total - 1)})`;
+      if (this.formulaBlob) this.formulaBlob.style.setProperty('--blob-scale', String(1 + next * 0.014));
+      this.layoutFormula();
+
+      const paint = () => {
+        this.formulaCaption.innerHTML = `<div class="formula-caption-inner">
+          <span class="f-kicker" dir="ltr">${data.kicker}</span>
+          <h3>${data.name}</h3>
+          <p>${data.line}</p>
+          <ul>${data.bullets.map(b => `<li>${b}</li>`).join('')}</ul>
+          <a class="f-cta" href="https://goom.co.il">להזמנת ${data.name}</a>
+        </div>`;
+        this.formulaCaption.classList.remove('is-swapping');
+      };
+      if (first || this.reduced) { paint(); return; }
+      this.formulaCaption.classList.add('is-swapping');
+      clearTimeout(this.captionTimer);
+      this.captionTimer = setTimeout(paint, 200);
+    };
+
+    section.querySelector('[data-f-prev]')?.addEventListener('click', () => this.goToFormula(this.formulaActive - 1, true));
+    section.querySelector('[data-f-next]')?.addEventListener('click', () => this.goToFormula(this.formulaActive + 1, true));
+
+    this.updateFormula = () => {
+      if (this.reduced) return;
+      const rect = section.getBoundingClientRect();
+      this.formulaSpan = Math.max(1, section.offsetHeight - window.innerHeight);
+      const p = this.clamp(-rect.top / this.formulaSpan);
+      this.goToFormula(Math.min(total - 1, Math.floor(p * total)));
+    };
+
+    window.addEventListener('resize', this.layoutFormula);
+    this.goToFormula(0);
+    this.updateFormula();
+  }
+
+  /* ---------- Testimonial ring ---------- */
+  initStories() {
+    const stories = document.querySelector('#stories');
+    const scene = stories?.querySelector('[data-stories-scene]');
+    const ring = stories?.querySelector('[data-ring3d]');
+    const slots = ring ? [...ring.querySelectorAll('[data-slot]')] : [];
+    if (!stories || !scene || !ring || !slots.length) return;
+
+    const count = slots.length;
+    const stepAngle = 360 / count;
+    const speed = 360 / 44000;
+    let angle = 0;
+    let paused = this.reduced;
+    let hovering = false;
+    let dragging = false;
+    let dragStart = 0;
+    let dragAngle = 0;
+    let last = 0;
+
+    const apply = (free) => { ring.classList.toggle('is-free', free !== false); ring.style.transform = `rotateY(${angle}deg)`; };
+    const tick = (now) => {
+      this.storyRaf = requestAnimationFrame(tick);
+      const delta = last ? Math.min(64, now - last) : 0;
+      last = now;
+      if (paused || hovering || dragging || !this.storiesVisible) return;
+      angle -= delta * speed;
+      apply(true);
+    };
+
+    const toggle = stories.querySelector('[data-spin-toggle]');
+    const setPaused = (value) => {
+      paused = value;
+      if (!toggle) return;
+      toggle.setAttribute('aria-pressed', String(paused));
+      toggle.textContent = paused ? 'המשך הסיבוב' : 'עצירת הסיבוב';
+    };
+
+    /* Taking manual control stops the drift — otherwise the card you just
+       stepped to slides away while you are reading it. */
+    const snap = (step) => {
+      setPaused(true);
+      angle = (Math.round(angle / stepAngle) + step) * stepAngle;
+      apply(false);
+    };
+
+    stories.querySelector('[data-arrow="prev"]')?.addEventListener('click', () => snap(1));
+    stories.querySelector('[data-arrow="next"]')?.addEventListener('click', () => snap(-1));
+    toggle?.addEventListener('click', () => setPaused(!paused));
+    if (this.reduced) setPaused(true);
+
+    scene.addEventListener('pointerenter', () => { hovering = true; });
+    scene.addEventListener('pointerleave', () => { hovering = false; });
+    let moved = false;
+    scene.addEventListener('pointerdown', event => {
+      dragging = true;
+      moved = false;
+      dragStart = event.clientX;
+      dragAngle = angle;
+      scene.setPointerCapture?.(event.pointerId);
+    });
+    scene.addEventListener('pointermove', event => {
+      if (!dragging) return;
+      if (Math.abs(event.clientX - dragStart) > 4) moved = true;
+      angle = dragAngle + (event.clientX - dragStart) * 0.28;
+      apply(true);
+    });
+    const endDrag = event => {
+      if (!dragging) return;
+      dragging = false;
+      scene.releasePointerCapture?.(event.pointerId);
+      if (moved) setPaused(true);
+      angle = Math.round(angle / stepAngle) * stepAngle;
+      apply(false);
+    };
+    scene.addEventListener('pointerup', endDrag);
+    scene.addEventListener('pointercancel', endDrag);
+
+    slots.forEach(slot => slot.addEventListener('click', () => {
+      if (moved) return;
+      const video = slot.querySelector('video');
+      if (!video) return;
+      slots.forEach(other => { if (other !== slot) other.querySelector('video')?.pause(); });
+      if (video.paused) { video.preload = 'auto'; video.play().catch(() => {}); }
+      else video.pause();
+    }));
+
+    this.storiesVisible = false;
+    this.storyObserver = new IntersectionObserver(([entry]) => {
+      this.storiesVisible = entry.isIntersecting;
+      if (entry.isIntersecting) stories.classList.add('is-in-view');
+    }, { threshold: 0.08 });
+    this.storyObserver.observe(stories);
+
+    apply(true);
+    this.storyRaf = requestAnimationFrame(tick);
+  }
+
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

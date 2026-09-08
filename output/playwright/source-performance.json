@@ -1,0 +1,15 @@
+{
+  "intervalMedianMs": 16.699999999999818,
+  "intervalP95Ms": 16.700000000000728,
+  "frameLagP95": 0,
+  "maxFrameLag": 0,
+  "distinctSourceFrames": 171,
+  "frame": 3,
+  "renderedFrame": 3,
+  "cachedFrames": 24,
+  "pendingFrames": 0,
+  "variant": "desktop",
+  "failedFrames": 0,
+  "progress": 0.01591529906814348,
+  "reducedMotion": false
+}

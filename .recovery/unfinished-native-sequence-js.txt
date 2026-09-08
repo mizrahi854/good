@@ -1,0 +1,167 @@
+  /* Original recorded motion. Every displayed frame is a native source frame;
+     the supplied clean JPEGs guide UI removal and uniform image enhancement. */
+  initHero() {
+    if (!this.hero) return;
+    this.copyBlocks=[...this.hero.querySelectorAll('.hero-copy')];
+    this.journeyFormula=this.hero.querySelector('.journey-formula');
+    this.tagline=this.hero.querySelector('.hero-tagline');
+    this.cue=this.hero.querySelector('.hero-cue');
+    this.chapters=[...this.hero.querySelectorAll('[data-chapter]')];
+    this.sequenceLayer=this.hero.querySelector('.source-sequence');
+    this.canvas=this.hero.querySelector('[data-source-canvas]');
+    this.ctx=this.canvas.getContext('2d',{alpha:false});
+    this.frameCache=new Map();this.framePending=new Set();this.frameFailures=new Set();
+    this.frameQueue=[];this.frameWorkers=0;this.frameCount=173;this.renderProgress=0;
+    this.mediaAbort=new AbortController();
+    this.measureJourney=()=>{
+      const pin=this.hero.querySelector('.hero-pin');
+      const w=pin.clientWidth,h=this.reduced?Math.max(600,innerHeight):pin.clientHeight;
+      const mobile=w<=900&&h>w;
+      const dpr=Math.min(devicePixelRatio||1,mobile?2:1.5);
+      this.canvas.width=Math.round(w*dpr);this.canvas.height=Math.round(h*dpr);
+      this.ctx.imageSmoothingEnabled=true;this.ctx.imageSmoothingQuality='high';
+      this.journeyLayout={w,h,mobile,dpr,span:Math.max(1,this.hero.offsetHeight-h)};
+      this.frameVariant=mobile?'mobile':'desktop';this.lastDrawnFrame=null;
+      this.updateHero();this.applySourceProgress(this.renderProgress);
+    };
+    this.journeyResize=new ResizeObserver(this.measureJourney);
+    this.journeyResize.observe(this.hero.querySelector('.hero-pin'));
+    this.measureJourney();
+    if (!this.reduced) fetch('assets/sequence/manifest.json',{signal:this.mediaAbort.signal})
+      .then(r=>{if(!r.ok)throw new Error('Sequence manifest');return r.json()})
+      .then(data=>{this.sequenceManifest=data;this.lastDrawnFrame=null;this.applySourceProgress(this.renderProgress);this.warmSequence();})
+      .catch(()=>{});
+  }
+
+  updateHero() {
+    if(!this.journeyLayout)return;
+    this.targetProgress=this.reduced?0:this.clamp(-this.hero.getBoundingClientRect().top/this.journeyLayout.span);
+    if(this.reduced){this.applySourceProgress(0);return;}
+    if(this.sequenceRaf)return;
+    let previous=0;
+    const tick=now=>{
+      this.sequenceRaf=0;if(this.destroyed)return;
+      const dt=previous?Math.min(64,now-previous):16.7;previous=now;
+      this.renderProgress+=(this.targetProgress-this.renderProgress)*(1-Math.exp(-dt/55));
+      if(Math.abs(this.targetProgress-this.renderProgress)<.0004)this.renderProgress=this.targetProgress;
+      this.applySourceProgress(this.renderProgress);
+      if(this.renderProgress!==this.targetProgress)this.sequenceRaf=requestAnimationFrame(tick);
+    };
+    this.sequenceRaf=requestAnimationFrame(tick);
+  }
+
+  applySourceProgress(p) {
+    if(!this.journeyLayout)return;
+    const frame=Math.min(this.frameCount-1,Math.round(this.clamp(p/.87)*(this.frameCount-1)));
+    this.wantedFrame=frame;
+    if(!this.reduced){this.queueSequenceFrames(frame);this.drawSequenceFrame(frame);}
+    const fade=this.clamp((p-.88)/.09),final=p>=.97;
+    this.sequenceLayer.style.opacity=String(1-fade);
+    this.journeyFormula.style.opacity=String(this.reduced?1:fade);
+    this.journeyFormula.style.transform='none';
+    this.journeyFormula.classList.toggle('is-arrived',final||this.reduced);
+    this.journeyFormula.inert=!final&&!this.reduced;
+    this.journeyFormula.setAttribute('aria-hidden',String(!final&&!this.reduced));
+    if(p<.55&&this.formulaActive>=0&&this.formulaActive!==2)this.goToFormula(2);
+    const scene=frame<=69?1:frame>=106&&frame<=161&&p<.87?2:0;
+    this.copyBlocks.forEach(el=>{
+      const active=this.reduced||Number(el.dataset.scene)===scene;
+      el.classList.toggle('is-on',active);el.inert=!active;el.setAttribute('aria-hidden',String(!active));
+    });
+    this.tagline.style.opacity=String(1-this.clamp((frame-55)/16));
+    this.cue.style.opacity=String(1-this.clamp(p/.1));
+    const chapter=p<.47?0:p<.91?1:2;
+    this.chapters.forEach((b,i)=>{if(i===chapter)b.setAttribute('aria-current','step');else b.removeAttribute('aria-current');});
+    this.hero.dataset.progress=p.toFixed(4);
+    this.hero.dataset.sourceFrame=String(frame);
+  }
+
+  queueSequenceFrames(center) {
+    if(this.reduced||this.destroyed)return;
+    const variant=this.frameVariant;
+    const frames=[center];
+    const direction=center>=(this.previousWanted??0)?1:-1;
+    for(let d=1;d<=10;d++){frames.push(center+d*direction,center-d*direction);}
+    this.previousWanted=center;
+    this.frameQueue=frames.filter(n=>n>=0&&n<this.frameCount).map(n=>({n,key:variant+':'+n,variant}))
+      .filter(x=>!this.frameCache.has(x.key)&&!this.framePending.has(x.key)&&!this.frameFailures.has(x.key));
+    this.pumpSequenceFrames();
+  }
+
+  pumpSequenceFrames() {
+    while(this.frameWorkers<3&&this.frameQueue.length){
+      const job=this.frameQueue.shift();
+      if(this.frameCache.has(job.key)||this.framePending.has(job.key))continue;
+      this.frameWorkers++;this.framePending.add(job.key);
+      const url=`assets/sequence/${job.variant}/f${String(job.n).padStart(3,'0')}.webp`;
+      fetch(url,{cache:'force-cache',signal:this.mediaAbort.signal})
+        .then(r=>{if(!r.ok)throw new Error('Frame '+job.n);return r.blob();})
+        .then(blob=>createImageBitmap(blob))
+        .then(bitmap=>{
+          if(this.destroyed){bitmap.close();return;}
+          this.frameCache.set(job.key,{bitmap,n:job.n,variant:job.variant});
+          const keep=this.journeyLayout.mobile?20:24;
+          while(this.frameCache.size>keep){
+            const victim=[...this.frameCache.entries()].sort((a,b)=>{
+              const score=v=>Math.abs(v.n-this.wantedFrame)+(v.variant!==this.frameVariant?1000:0);
+              return score(b[1])-score(a[1]);
+            })[0];
+            victim[1].bitmap.close();this.frameCache.delete(victim[0]);
+          }
+          if(!this.decodeRaf)this.decodeRaf=requestAnimationFrame(()=>{this.decodeRaf=0;this.drawSequenceFrame(this.wantedFrame);});
+        })
+        .catch(e=>{if(e.name!=='AbortError')this.frameFailures.add(job.key);})
+        .finally(()=>{this.frameWorkers--;this.framePending.delete(job.key);if(!this.destroyed)this.pumpSequenceFrames();});
+    }
+  }
+
+  drawSequenceFrame(want) {
+    if(!this.ctx||this.reduced)return;
+    const variant=this.frameVariant;
+    let frame=this.frameCache.get(variant+':'+want);
+    if(!frame)frame=[...this.frameCache.values()].filter(f=>f.variant===variant).sort((a,b)=>Math.abs(a.n-want)-Math.abs(b.n-want))[0];
+    if(!frame)return;
+    const key=variant+':'+frame.n;
+    if(key===this.lastDrawnFrame)return;
+    const {w,h,mobile,dpr}=this.journeyLayout;
+    const ctx=this.ctx;ctx.setTransform(dpr,0,0,dpr,0,0);
+    const rgb=this.sequenceManifest?.colors[frame.n]||[204,193,220];
+    const color=`rgb(${rgb.join(',')})`;
+    ctx.fillStyle=color;ctx.fillRect(0,0,w,h);
+    if(mobile){
+      // Reframe the whole recorded shot; no independent bottle or liquid motion.
+      const t=this.clamp((frame.n-65)/45),smooth=t*t*(3-2*t);
+      const dw=w*(1.55+smooth*.4),dh=dw*9/16;
+      const dx=w*.53-dw*.62,dy=h*(.32+smooth*.08);
+      ctx.drawImage(frame.bitmap,dx,dy,dw,dh);
+      const edge=dh*.1;
+      let g=ctx.createLinearGradient(0,dy,0,dy+edge);g.addColorStop(0,color);g.addColorStop(1,`rgba(${rgb.join(',')},0)`);
+      ctx.fillStyle=g;ctx.fillRect(0,dy,w,edge);
+      g=ctx.createLinearGradient(0,dy+dh-edge,0,dy+dh);g.addColorStop(0,`rgba(${rgb.join(',')},0)`);g.addColorStop(1,color);
+      ctx.fillStyle=g;ctx.fillRect(0,dy+dh-edge,w,edge+1);
+    }else{
+      const scale=Math.max(w/frame.bitmap.width,h/frame.bitmap.height);
+      const dw=frame.bitmap.width*scale,dh=frame.bitmap.height*scale;
+      ctx.drawImage(frame.bitmap,(w-dw)/2,(h-dh)/2,dw,dh);
+    }
+    this.lastDrawnFrame=key;this.hero.dataset.renderedFrame=String(frame.n);
+    this.hero.classList.add('sequence-ready');
+  }
+
+  async warmSequence() {
+    // Warm compressed HTTP cache with bounded concurrency, never decode the film
+    // into hundreds of full-resolution bitmaps (mobile memory stays bounded).
+    const variant=this.frameVariant;
+    let cursor=0;
+    const worker=async()=>{
+      while(cursor<this.frameCount&&!this.destroyed){
+        const n=cursor++;
+        try{
+          const r=await fetch(`assets/sequence/${variant}/f${String(n).padStart(3,'0')}.webp`,{cache:'force-cache',priority:'low',signal:this.mediaAbort.signal});
+          if(r.ok)await r.arrayBuffer();
+        }catch(e){if(e.name==='AbortError')return;}
+      }
+    };
+    await Promise.all([worker(),worker()]);
+  }
+

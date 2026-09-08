@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#cbbbe6">
+  <title>GOOM — הטוב שלך, בגומי</title>
+  <meta name="description" content="תוספי תזונה מדויקים בגומי לשגרה שמרגישה טוב.">
+  <link rel="icon" href="assets/logo.png" type="image/png">
+  <link rel="preload" href="assets/fonts/discovery-medium.woff" as="font" type="font/woff" crossorigin>
+  <link rel="stylesheet" href="site.css?v=20260908b">
+  <link rel="stylesheet" href="cinematic.css?v=20260908b">
+  <script src="app.js?v=20260908b" defer></script>
+</head>
+<body>
+<div class="goom-page" dir="rtl">
+  <header class="goom-header" data-header>
+    <div class="goom-bar">
+      <a class="goom-brand" href="#top" aria-label="GOOM — חזרה להתחלה"><img src="assets/logo.png" alt="GOOM"></a>
+      <nav class="goom-nav" aria-label="ניווט ראשי">
+        <a href="#formulas">המוצרים</a>
+        <a href="#how">איך זה עובד</a>
+        <a href="#stories">המלצות</a>
+        <a href="#about">אודות</a>
+        <a href="#faq">שאלות ותשובות</a>
+      </nav>
+      
+      <!-- כפתור התחברות עם אייקון -->
+      <a class="goom-login-btn" href="/login" aria-label="התחברות לחשבון">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+          <circle cx="12" cy="7" r="4"></circle>
+        </svg>
+      </a>
+
+      <button class="goom-menu" type="button" aria-label="תפריט"><i></i><i></i></button>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero uses-source-sequence" data-hero aria-labelledby="hero-title">
+      <div class="hero-pin">
+        <div class="source-sequence" aria-hidden="true">
+          <img class="source-poster" src="assets/sequence/desktop/f000.webp" alt="" fetchpriority="high">
+          <canvas class="source-canvas" data-source-canvas width="1920" height="1080"></canvas>
+        </div>
+        <div class="journey-scene journey-lineup" aria-hidden="true">
+          <div class="lineup-plane" data-lineup-plane>
+            <img class="lineup-bottle lineup-flow-static" src="assets/flow-clean.png" alt="">
+            <img class="journey-plate" src="assets/bg-a.jpg" alt="" fetchpriority="high">
+            <img class="lineup-bottle lineup-grow" src="assets/p-grow.png" alt="">
+            <img class="lineup-bottle lineup-b12" src="assets/p-b12.png" alt="">
+            <img class="lineup-bottle lineup-shine" src="assets/p-shine.png" alt="">
+            <img class="lineup-bottle lineup-sleep" src="assets/p-sleep.png" alt="">
+          </div>
+        </div>
+        <div class="journey-scene journey-splash" aria-hidden="true"><img src="assets/bg-c.jpg" alt=""></div>
+        <div class="journey-tether" aria-hidden="true"><svg viewBox="0 0 300 800" preserveAspectRatio="none"><defs><linearGradient id="gel-edge" x1="0" x2="1"><stop stop-color="#8261ba" stop-opacity=".3"/><stop offset=".2" stop-color="#ffffff" stop-opacity=".95"/><stop offset=".45" stop-color="#b89fdf" stop-opacity=".3"/><stop offset=".75" stop-color="#ffffff" stop-opacity=".85"/><stop offset="1" stop-color="#9a7ac9" stop-opacity=".4"/></linearGradient></defs><path d="M60 0 C35 240 8 390 38 590 C50 710 90 778 150 780 C210 778 250 710 262 590 C292 390 265 240 240 0" fill="none" stroke="url(#gel-edge)" stroke-width="16"/><path d="M60 0 C35 240 8 390 38 590 C50 710 90 778 150 780 C210 778 250 710 262 590 C292 390 265 240 240 0" fill="none" stroke="#fff" stroke-opacity=".6" stroke-width="2"/></svg></div>
+        <img class="journey-flow" src="assets/flow-clean.png" alt="פורמולת Flow של GOOM" fetchpriority="high" data-journey-flow>
+        
+        <div class="hero-copy is-on" data-scene="1">
+          <img class="hero-wordmark hero-wordmark-new" src="assets/לוגו.png" alt="GOOM" width="1344" height="1200" fetchpriority="high">
+          <h1 id="hero-title">הטוב שלך, בגומי.</h1>
+
+          <div class="hero-actions">
+            <a class="hero-btn liquid-glass" href="#formulas">מצאו את הפורמולה שלכם <span aria-hidden="true">↗</span></a>
+            <a class="hero-btn ghost liquid-glass" href="#how">איך זה עובד</a>
+          </div>
+        </div>
+        <div class="hero-copy" data-scene="2" aria-hidden="true" inert>
+          <span class="f-eyebrow" dir="ltr">FEEL THE FLOW</span>
+          <h2>הפורמולה שמתאימה<br>לשגרה שלך.</h2>
+          <p>מיקרוביום מאוזן, תחושת קלילות ואנרגיה יומיומית עם גומיות פרוביוטיקה טעימות שתומכות בך.</p>
+          <a class="hero-btn" href="#formulas">מה יש בפנים? <span aria-hidden="true">←</span></a>
+        </div>
+        <p class="hero-tagline" dir="ltr">WELLNESS BUT MAKE IT TASTY</p>
+    <section class="formula journey-formula" id="formulas" data-formula tabindex="-1" aria-labelledby="formula-title">
+      <div class="formula-pin">
+        <div class="formula-blob" aria-hidden="true">
+          <img class="formula-plate" src="assets/bg-b.jpg" alt="" decoding="async">
+        </div>
+
+        <div class="formula-stage">
+          <div class="formula-rail" data-formula-rail></div>
+        </div>
+
+        <div class="formula-head">
+          <span class="f-eyebrow">THE GOOM FORMULAS</span>
+          <h2 id="formula-title">הפורמולה שמתאימה<br>לשגרה שלך.</h2>
+          <div class="f-rule" aria-hidden="true"></div>
+          <div class="formula-caption" data-formula-caption aria-live="polite"></div>
+        </div>
+
+        <div class="formula-arrows">
+          <button class="formula-arrow" type="button" data-f-prev aria-label="הפורמולה הקודמת">&#8250;</button>
+          <button class="formula-arrow" type="button" data-f-next aria-label="הפורמולה הבאה">&#8249;</button>
+        </div>
+
+        <div class="formula-track" dir="ltr" data-formula-track>
+          <div class="formula-track-line"><span class="formula-track-fill" data-track-fill></span>
+            <div class="formula-nodes" role="tablist" aria-label="בחירת פורמולה"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+        <nav class="journey-chapters" aria-label="תחנות בחוויית GOOM">
+          <button type="button" data-chapter="0" aria-current="step"><i></i><span>הטוב שלך</span></button>
+          <button type="button" data-chapter="1"><i></i><span>להיכנס ל־Flow</span></button>
+          <button type="button" data-chapter="2"><i></i><span>הפורמולות</span></button>
+        </nav>
+        <span class="hero-cue" aria-hidden="true">SCROLL TO FEEL GOOD <i></i></span>
+      </div>
+    </section>
+
+    <section class="ritual" id="ritual" aria-labelledby="ritual-title">
+      <div class="ritual-copy" data-reveal>
+        <span class="f-eyebrow" dir="ltr">A LITTLE MOMENT. ALL YOURS.</span>
+        <h2 id="ritual-title">רגע קטן.<br>כולו שלך.</h2>
+        <p>בין הקפה הראשון לסוף היום, יש רגע אחד שאפשר לשמור לעצמך. טעם טוב, פורמולה שבחרת, והרגל שכיף לחזור אליו.</p>
+        <div class="ritual-options" role="group" aria-label="בחרו רגע ביום">
+          <button type="button" data-ritual="0" aria-pressed="true">01 · הבוקר שלי</button>
+          <button type="button" data-ritual="1" aria-pressed="false">02 · בקצב שלי</button>
+          <button type="button" data-ritual="2" aria-pressed="false">03 · הלילה שלי</button>
+        </div>
+        <p class="ritual-note" data-ritual-note aria-live="polite">פותחים את היום בצבע. B12 + D3 + B9.</p>
+        <a class="ritual-link" href="#formulas">לגלות את הפורמולות <span aria-hidden="true">←</span></a>
+      </div>
+      <div class="ritual-stage" aria-label="תצוגת מוצרים בתלת־ממד">
+        <div class="ritual-orbit" aria-hidden="true"></div>
+        <div class="ritual-orbit orbit-two" aria-hidden="true"></div>
+        <span class="ritual-word" aria-hidden="true" dir="ltr">GOOD<br>EVERY DAY.</span>
+        <div class="ritual-products">
+          <img src="assets/p-b12.png" alt="B12+D3+B9" loading="lazy" decoding="async" data-ritual-product="0">
+          <img src="assets/flow-clean.png" alt="Flow" loading="lazy" decoding="async" data-ritual-product="1">
+          <img src="assets/p-sleep.png" alt="Deep Sleep" loading="lazy" decoding="async" data-ritual-product="2">
+        </div>
+        <span class="ritual-caption" dir="ltr">YOUR DAILY DOSE OF GOOD</span>
+      </div>
+    </section>
+
+    <section class="how" id="how" aria-labelledby="how-title">
+      <div class="how-inner">
+        <div class="how-head" data-reveal>
+          <div>
+            <span class="f-eyebrow">HOW IT WORKS</span>
+            <h2 id="how-title">שלושה שלבים.<br><em>30 שניות לעצמך.</em></h2>
+          </div>
+          <p>בלי תוכניות, בלי טבלאות ובלי להתחיל ביום ראשון. בוחרים מה חשוב לך עכשיו, ומשם זה כמעט מתנהל לבד.</p>
+        </div>
+        <div class="how-timer" aria-hidden="true"><span>00:30</span><i></i><small>רגע קטן. הרגל חדש.</small></div>
+        <div class="how-grid">
+          <article class="how-card" data-reveal>
+            <span class="how-step">01</span><div class="step-art step-choice" aria-hidden="true"><img src="assets/p-grow.png" alt=""><img src="assets/flow-clean.png" alt=""><img src="assets/p-sleep.png" alt=""></div>
+            <h3>בוחרים מטרה</h3>
+            <p>עיכול, אנרגיה, שיער ועור, זוהר או שינה. מתחילים מהדבר שהכי מציק — לא מרשימת קניות.</p>
+          </article>
+          <article class="how-card" data-reveal>
+            <span class="how-step">02</span><div class="step-art step-delivery" aria-hidden="true"><div class="mini-box">GOOM<span>GOOD THINGS INSIDE.</span></div><img src="assets/flow-clean.png" alt=""></div>
+            <h3>מקבלים פורמולה</h3>
+            <p>מוצאים את הפורמולה שמתאימה למטרה שלכם. כל ההרכב והוראות השימוש מחכים בעמוד המוצר.</p>
+          </article>
+          <article class="how-card" data-reveal>
+            <span class="how-step">03</span><div class="step-art step-daily" aria-hidden="true"><span class="daily-orbit"></span><img src="assets/gum1.png" alt=""><b>☀</b></div>
+            <h3>מכניסים לשגרה</h3>
+            <p>בוחרים רגע קבוע ביום, ופועלים לפי ההוראות של הפורמולה שבחרתם. הרגל קטן שכיף לחזור אליו.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="stories" aria-labelledby="stories-title">
+      <div class="stories-head" data-reveal>
+        <h2 id="stories-title">אנשים אמיתיים.<br>המלצות אמיתיות.</h2>
+        <p class="stories-sub">הטבעת מסתובבת לבד.<br>עצרו עליה, ולחצו על מי שתרצו לשמוע.</p>
+      </div>
+
+      <div data-stage3d>
+        <div class="stories-scene" dir="ltr" data-stories-scene>
+          <div class="stories-ring" data-ring3d style="--n:12">
+          <button class="stories-card" data-slot style="--i:0"><video src="assets/adar-story.mp4" poster="assets/stories/noa-poster-sm.jpg" preload="none" muted loop playsinline></video><span class="story-play"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>נועה · הבוקר שלי סוף סוף רגוע</span></button>
+          <button class="stories-card" data-slot style="--i:1"><video src="assets/brand-story.mp4" poster="assets/stories/adar-poster-sm.jpg" preload="none" muted loop playsinline></video><span class="story-play"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>אדר · לקח לי שבועיים להרגיש את זה</span></button>
+          <button class="stories-card" data-slot style="--i:2"><video src="assets/guy-story.mp4" poster="assets/stories/shir-poster-sm.jpg" preload="none" muted loop playsinline></video><span class="story-play"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>שיר · טעים מדי בשביל ויטמין</span></button>
+          <button class="stories-card" data-slot style="--i:3"><video src="assets/guy-story.mp4" poster="assets/stories/guy-poster-sm.jpg" preload="none" muted loop playsinline></video><span class="story-play"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>גיא · נכנס לשגרה בלי מאמץ</span></button>
+          <button class="stories-card" data-slot style="--i:4"><video src="assets/brand-story.mp4" poster="assets/stories/elia-poster-sm.jpg" preload="none" muted loop playsinline></video><span class="story-play"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>אליה · העור שלי אמר תודה</span></button>
+          <button class="stories-card" data-slot style="--i:5"><video src="assets/adar-story.mp4" poster="assets/stories/doctor-poster-sm.jpg" preload="none" muted loop playsinline></video><span class="story-play"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>ד"ר רון · ההרכב פה באמת מדויק</span></button>
+          <button class="stories-card" data-slot style="--i:6"><video src="assets/adar-story.mp4" poster="assets/stories/noa-poster-sm.jpg" preload="none" muted loop playsinline></video><span class="story-play"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>נועה · הבוקר שלי סוף סוף רגוע</span></button>
+          <button class="stories-card" data-slot style="--i:7"><video src="assets/brand-story.mp4" poster="assets/stories/adar-poster-sm.jpg" preload="none" muted loop playsinline></video><span class="story-play"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>אדר · לקח לי שבועיים להרגיש את זה</span></button>
+          <button class="stories-card" data-slot style="--i:8"><video src="assets/guy-story.mp4" poster="assets/stories/shir-poster-sm.jpg" preload="none" muted loop playsinline></video><span class="story-play"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>שיר · טעים מדי בשביל ויטמין</span></button>
+          <button class="stories-card" data-slot style="--i:9"><video src="assets/guy-story.mp4" poster="assets/stories/guy-poster-sm.jpg" preload="none" muted loop playsinline></video><span class="story-play"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>גיא · נכנס לשגרה בלי מאמץ</span></button>
+          <button class="stories-card" data-slot style="--i:10"><video src="assets/brand-story.mp4" poster="assets/stories/elia-poster-sm.jpg" preload="none" muted loop playsinline></video><span class="story-play"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>אליה · העור שלי אמר תודה</span></button>
+          <button class="stories-card" data-slot style="--i:11"><video src="assets/adar-story.mp4" poster="assets/stories/doctor-poster-sm.jpg" preload="none" muted loop playsinline></video><span class="story-play"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>ד"ר רון · ההרכב פה באמת מדויק</span></button>
+          </div>
+        </div>
+        <div class="stories-controls">
+          <button class="stories-arrow" data-arrow="prev" type="button" aria-label="הקודם">&#8249;</button>
+          <button class="stories-pause" data-spin-toggle type="button" aria-pressed="false">עצירת הסיבוב</button>
+          <button class="stories-arrow" data-arrow="next" type="button" aria-label="הבא">&#8250;</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="about" class="gh-brand" aria-labelledby="brand-title">
+      <div class="gh-container">
+        <header class="gh-brand-statement" data-reveal>
+          <span class="gh-eyebrow">THIS IS YOUR SIGN</span>
+          <h2 id="brand-title">מעולם לא היה קל יותר<br>להשקיע <span>בעצמך.</span></h2>
+          <span class="gh-brand-signature" dir="ltr">FEEL GOOD.<br>GO GOOM.</span>
+        </header>
+        <div class="gh-brand-grid">
+          <figure class="gh-brand-photo" data-reveal>
+            <video src="assets/brand-story.mp4" poster="assets/quality-lifestyle.jpg" muted loop autoplay playsinline preload="metadata" aria-label="רגעים מהעולם של GOOM"></video>
+            <img src="assets/quality-lifestyle.jpg" alt="רגע קטן בשגרת GOOM" loading="lazy">
+            <figcaption>החלטה קטנה. מקום גדול לעצמכם.</figcaption>
+          </figure>
+          <div class="gh-brand-copy">
+            <p class="gh-lead" data-reveal>זה לא סתם סלוגן.<br>זה ה״אני מאמין״ שלנו.</p>
+            <p data-reveal>לא צריך לחכות ל״אחרי החגים״, לשבוע הבא, לשנה החדשה או לשינוי גדול בחיים. רוב הפעמים זה מתחיל בהחלטה אחת קטנה.</p>
+            <p data-reveal>אנחנו ב־GOOM מאמינים שההחלטה הזאת צריכה להיות כמה שיותר פשוטה. לכן פיתחנו תוספי תזונה מיוחדים — בגומי.</p>
+            <p data-reveal>סדרה איכותית, מדויקת, טעימה ובסטנדרט הגבוה ביותר, שנכנסת בקלות לשגרה שלך — בלי לחץ ובלי דרישות מוגזמות.</p>
+            <p data-reveal>וכל זה מתוך מטרה אחת: לעזור לך להרגיש טוב מבפנים החוצה, כל יום מחדש.</p>
+            <p class="gh-brand-finale" data-reveal>לא צריך תירוץ כדי להשקיע בעצמך.<br><strong>הזמן הכי טוב הוא עכשיו.</strong></p>
+            <a class="gh-text-link" href="#top">למציאת הפורמולה שלך <svg class="gh-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M19 12H5m6-6-6 6 6 6"></path></svg></a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="press" class="press-section">
+      <p data-reveal>בטח ראיתם אותנו גם ב</p>
+      <div class="press-mask"><div class="press-track">
+        <span class="press-logo"><img src="assets/press/press-reshet.png" alt="רשת 13"></span><span class="press-logo"><img src="assets/press/press-7.png" alt="ערוץ 7"></span><span class="press-logo"><img src="assets/press/press-maariv.png" alt="מעריב"></span><span class="press-logo"><img src="assets/press/press-terminalx.png" alt="Terminal X"></span><span class="press-logo"><img src="assets/press/press-5.webp" alt="BIO גאיה"></span><span class="press-logo"><img src="assets/press/press-israelhayom.png" alt="ישראל היום"></span><span class="press-logo"><img src="assets/press/press-14.svg" alt="ערוץ 14"></span><span class="press-logo"><img src="assets/press/press-hitechzone.webp" alt="Hitech Zone"></span>
+        <span class="press-logo"><img src="assets/press/press-reshet.png" alt=""></span><span class="press-logo"><img src="assets/press/press-7.png" alt=""></span><span class="press-logo"><img src="assets/press/press-maariv.png" alt=""></span><span class="press-logo"><img src="assets/press/press-terminalx.png" alt=""></span><span class="press-logo"><img src="assets/press/press-5.webp" alt=""></span><span class="press-logo"><img src="assets/press/press-israelhayom.png" alt=""></span><span class="press-logo"><img src="assets/press/press-14.svg" alt=""></span><span class="press-logo"><img src="assets/press/press-hitechzone.webp" alt=""></span>
+      </div></div>
+    </section>
+
+    <section id="community" class="community-section">
+      <div class="community-head" data-reveal><h2>טעימה קטנה<br>מהקהילה שלנו</h2><p>אלפי אנשים כבר הכניסו את GOOM לשגרה שלהם. אלה הרגעים שהם משתפים איתנו.</p></div>
+      <div class="community-rows">
+        <div class="community-track"><img src="assets/social/social-17-sm.jpg" alt=""><img src="assets/social/social-18-sm.jpg" alt=""><img src="assets/social/social-20-sm.jpg" alt=""><img src="assets/social/social-22-sm.jpg" alt=""><img src="assets/social/quality-lifestyle-sm.jpg" alt=""><img src="assets/social/community-current-sm.jpg" alt=""><img src="assets/social/wellness-hero.png" alt=""><img src="assets/social/social-17-sm.jpg" alt=""><img src="assets/social/social-18-sm.jpg" alt=""><img src="assets/social/social-20-sm.jpg" alt=""><img src="assets/social/social-22-sm.jpg" alt=""><img src="assets/social/quality-lifestyle-sm.jpg" alt=""><img src="assets/social/community-current-sm.jpg" alt=""><img src="assets/social/wellness-hero.png" alt=""></div>
+        <div class="community-track"><img src="assets/stories/noa-poster-sm.jpg" alt=""><img src="assets/stories/adar-poster-sm.jpg" alt=""><img src="assets/stories/shir-poster-sm.jpg" alt=""><img src="assets/stories/guy-poster-sm.jpg" alt=""><img src="assets/stories/elia-poster-sm.jpg" alt=""><img src="assets/stories/doctor-poster-sm.jpg" alt=""><img src="assets/stories/noa-poster-sm.jpg" alt=""><img src="assets/stories/adar-poster-sm.jpg" alt=""><img src="assets/stories/shir-poster-sm.jpg" alt=""><img src="assets/stories/guy-poster-sm.jpg" alt=""><img src="assets/stories/elia-poster-sm.jpg" alt=""><img src="assets/stories/doctor-poster-sm.jpg" alt=""></div>
+      </div>
+    </section>
+
+
+    <section class="bundles" id="bundles" aria-labelledby="bundles-title">
+      <div class="bundles-heading" data-reveal><span class="f-eyebrow" dir="ltr">BETTER TOGETHER</span><h2 id="bundles-title">יותר טוב.<br><em>ביחד.</em></h2><p>יש דברים שפשוט משלימים זה את זה.<br>גלו את המארז שמתאים לרגעים שלכם.</p></div>
+      <div class="bundle-track">
+        <article class="bundle-card bundle-night" data-reveal>
+          <a href="https://goom.co.il/products/shine-sleep" aria-label="גלו את מארז Sleeping Beauty"><div class="bundle-art"><span class="bundle-halo"></span><span class="bundle-plinth"></span><img src="assets/p-shine.png" alt="Shine"><img src="assets/p-sleep.png" alt="Deep Sleep"></div></a>
+          <div class="bundle-info"><span dir="ltr">SHINE + DEEP SLEEP</span><h3>Sleeping Beauty</h3><p>שני רגעים לשגרת הטיפוח שלכם.</p><a href="https://goom.co.il/products/shine-sleep">לגלות את המארז <b aria-hidden="true">↗</b></a></div>
+        </article>
+        <article class="bundle-card bundle-day" data-reveal>
+          <a href="https://goom.co.il/products/באנדל" aria-label="גלו את מארז Day & Night"><div class="bundle-art"><span class="bundle-halo"></span><span class="bundle-plinth"></span><img src="assets/flow-clean.png" alt="Flow"><img src="assets/p-sleep.png" alt="Deep Sleep"></div></a>
+          <div class="bundle-info"><span dir="ltr">FLOW + DEEP SLEEP</span><h3>Day &amp; Night</h3><p>מהרגע שהיום מתחיל, עד שהוא נרגע.</p><a href="https://goom.co.il/products/באנדל">לגלות את המארז <b aria-hidden="true">↗</b></a></div>
+        </article>
+        <article class="bundle-card bundle-all" data-reveal>
+          <a href="https://goom.co.il/products/באנדל-היכרות" aria-label="גלו את מארז GOOM Complete"><div class="bundle-art"><span class="bundle-halo"></span><span class="bundle-plinth"></span><img src="assets/flow-clean.png" alt="Flow"><img src="assets/p-grow.png" alt="Grow"><img src="assets/p-shine.png" alt="Shine"><img src="assets/p-sleep.png" alt="Deep Sleep"></div></a>
+          <div class="bundle-info"><span dir="ltr">THE GOOM FAMILY</span><h3>GOOM Complete</h3><p>כל הפורמולות. מקום אחד להתחיל.</p><a href="https://goom.co.il/products/באנדל-היכרות">לגלות את המארז <b aria-hidden="true">↗</b></a></div>
+        </article>
+      </div>
+      <a class="bundles-all" href="https://goom.co.il/collections/all">לכל המארזים באתר GOOM <span aria-hidden="true">←</span></a>
+    </section>
+
+    <section class="faq" id="faq" aria-labelledby="faq-title">
+      <div class="faq-inner">
+        <div class="faq-head" data-reveal>
+          <span class="f-eyebrow">FAQ</span>
+          <h2 id="faq-title">שאלות שחוזרות אצלנו הכי הרבה.</h2>
+          <p>לא מצאת את מה שחיפשת? כתבו לנו ונחזור אליכם, בדרך כלל באותו יום.</p>
+          <a href="https://goom.co.il/pages/contact">לדבר איתנו</a>
+        </div>
+        <div class="faq-list" data-faq>
+          <div class="faq-item">
+            <button class="faq-q" type="button" data-faq-q aria-expanded="false"><span>תוך כמה זמן מרגישים משהו?</span><span aria-hidden="true"></span></button>
+            <div class="faq-a"><div><p>זה משתנה בין אדם לאדם ובין פורמולה לפורמולה. רוב האנשים מדווחים על תחושה ברורה אחרי שבועיים עד ארבעה שבועות של שימוש עקבי. Deep Sleep נוטה להיות מורגש מהר יותר, ו־Shine דורש את הסבלנות הכי גדולה.</p></div></div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-q" type="button" data-faq-q aria-expanded="false"><span>אפשר לשלב כמה פורמולות יחד?</span><span aria-hidden="true"></span></button>
+            <div class="faq-a"><div><p>כן, והרבה אנשים עושים את זה — למשל Flow בבוקר ו־Deep Sleep בערב. אם את בהיריון, מניקה, נוטלת תרופות קבועות או מטפלת בילד, כדאי לעבור על ההרכב עם רופא לפני שמשלבים.</p></div></div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-q" type="button" data-faq-q aria-expanded="false"><span>יש סוכר בגומי?</span><span aria-hidden="true"></span></button>
+            <div class="faq-a"><div><p>הגומי מתוק, אבל הכמות קטנה ומדובר במינון של גומי אחד ביום. ההרכב המלא של כל פורמולה מודפס על הצנצנת ומופיע גם בעמוד המוצר, כולל רשימת האלרגנים.</p></div></div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-q" type="button" data-faq-q aria-expanded="false"><span>מאיזה גיל אפשר?</span><span aria-hidden="true"></span></button>
+            <div class="faq-a"><div><p>הפורמולות שלנו מיועדות לבני 18 ומעלה, אלא אם צוין אחרת על האריזה. תוסף תזונה אינו תחליף לתזונה מגוונת ומאוזנת.</p></div></div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-q" type="button" data-faq-q aria-expanded="false"><span>איך שומרים על הגומי?</span><span aria-hidden="true"></span></button>
+            <div class="faq-a"><div><p>במקום קריר ויבש, הרחק משמש ישירה, עם המכסה סגור. אין צורך בקירור. תאריך התפוגה מוטבע על תחתית הצנצנת.</p></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="final-cta" id="feel-good">
+      <div class="final-cta-inner">
+        <div data-reveal><span class="f-eyebrow" dir="ltr">A LITTLE GOOD. EVERY DAY.</span><h2>הטוב שלך,<br><em>בגומי.</em></h2><p>בחרי מטרה, קבלי פורמולה. אפשר להתחיל מפורמולה אחת ולהמשיך למארז שמתאים לשגרה שלך.</p><div class="final-cta-actions"><a class="final-button" href="#formulas">לכל הפורמולות</a><a class="final-button alt" href="#community">לקהילת GOOM</a></div></div>
+        <div class="final-art final-lineup" data-reveal aria-label="משפחת הפורמולות של GOOM">
+          <span class="final-liquid" aria-hidden="true"></span>
+          <img src="assets/flow-clean.png" alt="Flow"><img src="assets/p-grow.png" alt="Grow"><img src="assets/p-shine.png" alt="Shine"><img src="assets/p-sleep.png" alt="Deep Sleep"><img src="assets/p-b12.png" alt="B12+D3+B9">
+          <span class="final-line" dir="rtl">כל יום. ה־GOOM שלו.</span>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="goom-footer">
+    <div class="footer-grid">
+      <div><img src="assets/logo.png" alt="GOOM"><p>תוספי תזונה בגומי, מיוצרים בישראל. אינם תחליף לתזונה מאוזנת.</p></div>
+      <div class="footer-col"><p>ה־GOOM שלכם</p><div><a href="#top">כל הפורמולות</a><a href="#community">Wellness Club</a><a href="#stories">כל הביקורות</a></div></div>
+      <div class="footer-col"><p>נעים להכיר</p><div><a href="#about">הסיפור שלנו</a><a href="#press">עלינו בתקשורת</a><a href="#community">קהילת GOOM</a></div></div>
+      <div class="footer-col"><p>אנחנו כאן</p><div><a href="https://goom.co.il/pages/contact">צור קשר</a><a href="https://goom.co.il/pages/שאלות-תשובות">שאלות ותשובות</a><a href="https://goom.co.il/policies/privacy-policy">פרטיות</a></div></div>
+    </div>
+    <p>עמוד הדגמה. הרכישה אינה פעילה.</p>
+  </footer>
+</div>
+</body>
+</html>

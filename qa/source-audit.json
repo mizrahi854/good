@@ -1,0 +1,69 @@
+{
+  "video": {
+    "width": 1280,
+    "height": 720,
+    "fps": 24.0,
+    "frames": 240,
+    "decoded_frames": 240
+  },
+  "existing_export": {
+    "files": 42,
+    "dimensions": [
+      [
+        1280,
+        720
+      ]
+    ]
+  },
+  "raw_export": {
+    "files": 50,
+    "dimensions": [
+      [
+        1280,
+        720
+      ]
+    ]
+  },
+  "layers": {
+    "bg-a.jpg": {
+      "width": 1900,
+      "height": 1069,
+      "bytes": 277262
+    },
+    "bg-b.jpg": {
+      "width": 1900,
+      "height": 1069,
+      "bytes": 220289
+    },
+    "bg-c.jpg": {
+      "width": 1900,
+      "height": 1069,
+      "bytes": 270979
+    },
+    "flow-clean.png": {
+      "width": 460,
+      "height": 849,
+      "bytes": 665706
+    },
+    "p-grow.png": {
+      "width": 275,
+      "height": 504,
+      "bytes": 276676
+    },
+    "p-b12.png": {
+      "width": 280,
+      "height": 510,
+      "bytes": 272574
+    },
+    "p-shine.png": {
+      "width": 276,
+      "height": 498,
+      "bytes": 290801
+    },
+    "p-sleep.png": {
+      "width": 281,
+      "height": 510,
+      "bytes": 298652
+    }
+  }
+}

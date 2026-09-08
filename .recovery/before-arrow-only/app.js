@@ -1,0 +1,637 @@
+'use strict';
+class GoomSite {
+  mount() {
+    this.reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    this.header = document.querySelector('[data-header]');
+    this.hero = document.querySelector('[data-hero]');
+    this.destroyed = false;
+
+    this.onScroll = () => {
+      if (this.raf) return;
+      this.raf = requestAnimationFrame(() => { this.raf = 0; this.updateScroll(); });
+    };
+    window.addEventListener('scroll', this.onScroll, { passive:true });
+    window.addEventListener('resize', this.onScroll);
+
+    this.initReveals();
+    this.initHero();
+    this.initFormula();
+    this.initStories();
+    this.initFaq();
+    this.initRitual();
+    this.initNavigation();
+    this.updateScroll();
+  }
+
+  destroy() {
+    this.destroyed = true;
+    window.removeEventListener('scroll', this.onScroll);
+    window.removeEventListener('resize', this.onScroll);
+    cancelAnimationFrame(this.raf);
+    cancelAnimationFrame(this.storyRaf);
+    clearTimeout(this.captionTimer);
+    this.revealObserver?.disconnect();
+    this.storyObserver?.disconnect();
+    if (this.layoutFormula) window.removeEventListener('resize', this.layoutFormula);
+    this.journeyResize?.disconnect();
+    this.navAbort?.abort();
+    this.mediaAbort?.abort();
+    cancelAnimationFrame(this.sequenceRaf);
+    cancelAnimationFrame(this.decodeRaf);
+    this.frameCache?.forEach(frame=>frame.bitmap.close());
+  }
+
+  clamp(value,min=0,max=1) { return Math.min(max,Math.max(min,value)); }
+
+  updateScroll() {
+    this.updateHero();
+    this.updateFormula?.();
+    this.header?.classList.toggle('is-scrolled', window.scrollY > 30);
+  }
+
+  /* Original recorded motion. Every displayed frame is a native source frame;
+     the supplied clean JPEGs guide UI removal and uniform image enhancement. */
+  initHero() {
+    if (!this.hero) return;
+    this.copyBlocks=[...this.hero.querySelectorAll('.hero-copy')];
+    this.journeyFormula=this.hero.querySelector('.journey-formula');
+    this.tagline=this.hero.querySelector('.hero-tagline');
+    this.cue=this.hero.querySelector('.hero-cue');
+    this.chapters=[...this.hero.querySelectorAll('[data-chapter]')];
+    this.sequenceLayer=this.hero.querySelector('.source-sequence');
+    this.canvas=this.hero.querySelector('[data-source-canvas]');
+    this.ctx=this.canvas.getContext('2d',{alpha:false});
+    this.frameCache=new Map();this.framePending=new Set();this.frameFailures=new Set();
+    this.frameAttempts=new Map();
+    this.frameQueue=[];this.frameWorkers=0;this.frameCount=146;this.renderProgress=0;
+    this.mediaAbort=new AbortController();
+    this.measureJourney=()=>{
+      const pin=this.hero.querySelector('.hero-pin');
+      const w=pin.clientWidth,h=this.reduced?Math.max(600,innerHeight):pin.clientHeight;
+      const mobile=w<=900&&h>w;
+      const dpr=Math.min(devicePixelRatio||1,mobile?2:1.5);
+      this.canvas.width=Math.round(w*dpr);this.canvas.height=Math.round(h*dpr);
+      this.ctx.imageSmoothingEnabled=true;this.ctx.imageSmoothingQuality='high';
+      this.journeyLayout={w,h,mobile,dpr,span:Math.max(1,this.hero.offsetHeight-h)};
+      this.frameVariant=mobile?'mobile':'desktop';this.lastDrawnFrame=null;
+      if(this.reduced){
+        const plane=this.hero.querySelector('[data-lineup-plane]');
+        const pw=mobile?w*1.55:Math.max(w,h*1900/1069),ph=pw*1069/1900;
+        Object.assign(plane.style,{width:pw+'px',height:ph+'px',left:(mobile?-w*.42:(w-pw)/2)+'px',top:(mobile?h*.32:(h-ph)/2)+'px'});
+      }
+      this.updateHero();this.applySourceProgress(this.renderProgress);
+    };
+    this.journeyResize=new ResizeObserver(this.measureJourney);
+    this.journeyResize.observe(this.hero.querySelector('.hero-pin'));
+    this.measureJourney();
+    if (!this.reduced) fetch('assets/sequence/manifest.json',{signal:this.mediaAbort.signal})
+      .then(r=>{if(!r.ok)throw new Error('Sequence manifest');return r.json()})
+      .then(data=>{this.sequenceManifest=data;this.lastDrawnFrame=null;this.applySourceProgress(this.renderProgress);this.warmSequence();})
+      .catch(()=>{});
+  }
+
+  updateHero() {
+    if(!this.journeyLayout)return;
+    this.targetProgress=this.reduced?0:this.clamp(-this.hero.getBoundingClientRect().top/this.journeyLayout.span);
+    if(this.reduced){this.applySourceProgress(0);return;}
+    if(this.sequenceRaf)return;
+    let previous=0;
+    const tick=now=>{
+      this.sequenceRaf=0;if(this.destroyed)return;
+      const dt=previous?Math.min(64,now-previous):16.7;previous=now;
+      this.renderProgress+=(this.targetProgress-this.renderProgress)*(1-Math.exp(-dt/55));
+      if(Math.abs(this.targetProgress-this.renderProgress)<.0004)this.renderProgress=this.targetProgress;
+      this.applySourceProgress(this.renderProgress);
+      if(this.renderProgress!==this.targetProgress)this.sequenceRaf=requestAnimationFrame(tick);
+    };
+    this.sequenceRaf=requestAnimationFrame(tick);
+  }
+
+  applySourceProgress(p) {
+    if(!this.journeyLayout)return;
+    const frame=Math.min(145,Math.round(this.clamp(p/.32)*145));
+    this.wantedFrame=frame;
+    if(!this.reduced){this.queueSequenceFrames(frame);this.drawSequenceFrame(frame);}
+    const blend=this.clamp((p-.32)/.10),mix=this.clamp((blend-.6)/.4),fade=mix*mix*(3-2*mix),final=p>=.42;
+    const moveT=this.clamp((blend-.18)/.50),move=moveT*moveT*(3-2*moveT);
+    this.sequenceLayer.style.opacity=String(1-fade);
+    // Exit directly from the intact orange splash, before the filmed ring starts.
+    const {w,h,mobile}=this.journeyLayout;
+    const sourceX=mobile?w*.536:w*.635,sourceY=mobile?h*.65:h*.46;
+    const targetX=mobile?w*.5:w*.34,targetY=mobile?h*.43:h*.46;
+    const surround=1-this.clamp(blend/.18);
+    const rx=Math.min(sourceX,w-sourceX)*.98,ry=Math.min(sourceY,h-sourceY)*.98;
+    this.sequenceLayer.style.maskImage=blend===0?'none':`linear-gradient(rgba(0,0,0,${surround}),rgba(0,0,0,${surround})),radial-gradient(ellipse ${rx}px ${ry}px at ${sourceX}px ${sourceY}px,#000 80%,transparent 100%)`;
+    this.sequenceLayer.style.transformOrigin=`${sourceX}px ${sourceY}px`;
+    this.sequenceLayer.style.transform=`translate3d(${(targetX-sourceX)*move}px,${(targetY-sourceY)*move}px,0) scale(${1-move*.20}) rotate(${-14*move}deg)`;
+    this.journeyFormula.style.opacity=String(this.reduced?1:this.clamp(blend/.6));
+    if(this.formulaItems?.[2])this.formulaItems[2].style.visibility=(!this.reduced&&blend<.6)?'hidden':'visible';
+    this.journeyFormula.style.transform='none';
+    this.journeyFormula.classList.toggle('is-arrived',final||this.reduced);
+    this.journeyFormula.inert=!final&&!this.reduced;
+    this.journeyFormula.setAttribute('aria-hidden',String(!final&&!this.reduced));
+    const beat=Math.min(4,Math.floor(Math.max(0,p-.42)/.116));
+    if(!this.reduced&&this.goToFormula){
+      const index=[2,3,4,0,1][beat];
+      if(this.formulaActive!==index)this.goToFormula(index);
+    }
+    this.hero.dataset.formulaBeat=String(beat);
+    const scene=frame<=69?1:frame>=106&&p<.35?2:0;
+    this.copyBlocks.forEach(el=>{
+      const active=this.reduced||Number(el.dataset.scene)===scene;
+      el.classList.toggle('is-on',active);el.inert=!active;el.setAttribute('aria-hidden',String(!active));
+    });
+    this.tagline.style.opacity=String(1-this.clamp((frame-55)/16));
+    this.cue.style.opacity=String(1-this.clamp(p/.1));
+    const chapter=p<.23?0:p<.42?1:2;
+    this.chapters.forEach((b,i)=>{if(i===chapter)b.setAttribute('aria-current','step');else b.removeAttribute('aria-current');});
+    this.hero.dataset.progress=p.toFixed(4);
+    this.hero.dataset.sourceFrame=String(frame);
+  }
+
+  queueSequenceFrames(center) {
+    if(this.reduced||this.destroyed)return;
+    const variant=this.frameVariant;
+    const frames=[center];
+    const direction=center>=(this.previousWanted??0)?1:-1;
+    for(let d=1;d<=10;d++){frames.push(center+d*direction,center-d*direction);}
+    this.previousWanted=center;
+    this.frameQueue=frames.filter(n=>n>=0&&n<this.frameCount).map(n=>({n,key:variant+':'+n,variant}))
+      .filter(x=>!this.frameCache.has(x.key)&&!this.framePending.has(x.key)&&!this.frameFailures.has(x.key));
+    this.pumpSequenceFrames();
+  }
+
+  pumpSequenceFrames() {
+    while(this.frameWorkers<3&&this.frameQueue.length){
+      const job=this.frameQueue.shift();
+      if(this.frameCache.has(job.key)||this.framePending.has(job.key))continue;
+      this.frameWorkers++;this.framePending.add(job.key);
+      const url=`assets/sequence/${job.variant}/f${String(job.n).padStart(3,'0')}.webp`;
+      fetch(url,{cache:'force-cache',signal:this.mediaAbort.signal})
+        .then(r=>{if(!r.ok)throw new Error('Frame '+job.n);return r.blob();})
+        .then(blob=>createImageBitmap(blob))
+        .then(bitmap=>{
+          if(this.destroyed){bitmap.close();return;}
+          this.frameCache.set(job.key,{bitmap,n:job.n,variant:job.variant});
+          const keep=this.journeyLayout.mobile?20:24;
+          while(this.frameCache.size>keep){
+            const victim=[...this.frameCache.entries()].sort((a,b)=>{
+              const score=v=>Math.abs(v.n-this.wantedFrame)+(v.variant!==this.frameVariant?1000:0);
+              return score(b[1])-score(a[1]);
+            })[0];
+            victim[1].bitmap.close();this.frameCache.delete(victim[0]);
+          }
+          if(!this.decodeRaf)this.decodeRaf=requestAnimationFrame(()=>{this.decodeRaf=0;this.drawSequenceFrame(this.wantedFrame);});
+        })
+        .catch(e=>{
+          if(e.name==='AbortError'||this.destroyed)return;
+          const attempts=(this.frameAttempts.get(job.key)||0)+1;
+          this.frameAttempts.set(job.key,attempts);
+          if(attempts>=3)this.frameFailures.add(job.key);
+          else setTimeout(()=>{if(!this.destroyed)this.queueSequenceFrames(this.wantedFrame);},250*attempts);
+        })
+        .finally(()=>{this.frameWorkers--;this.framePending.delete(job.key);if(!this.destroyed)this.pumpSequenceFrames();});
+    }
+  }
+
+  drawSequenceFrame(want) {
+    if(!this.ctx||this.reduced)return;
+    const variant=this.frameVariant;
+    let frame=this.frameCache.get(variant+':'+want);
+    if(!frame)frame=[...this.frameCache.values()].filter(f=>f.variant===variant).sort((a,b)=>Math.abs(a.n-want)-Math.abs(b.n-want))[0];
+    if(!frame)return;
+    const key=variant+':'+frame.n;
+    if(key===this.lastDrawnFrame)return;
+    const {w,h,mobile,dpr}=this.journeyLayout;
+    const ctx=this.ctx;ctx.setTransform(dpr,0,0,dpr,0,0);
+    const rgb=this.sequenceManifest?.colors?.[frame.n]||[204,193,220];
+    const color=`rgb(${rgb.join(',')})`;
+    ctx.fillStyle=color;ctx.fillRect(0,0,w,h);
+    if(mobile){
+      // Reframe the whole recorded shot; no independent bottle or liquid motion.
+      const t=this.clamp((frame.n-65)/45),smooth=t*t*(3-2*t);
+      const dw=w*(1.55+smooth*.4),dh=dw*9/16;
+      const dx=w*.53-dw*.62,dy=h*(.32+smooth*.08);
+      ctx.drawImage(frame.bitmap,dx,dy,dw,dh);
+      const edge=dh*.1;
+      let g=ctx.createLinearGradient(0,dy,0,dy+edge);g.addColorStop(0,color);g.addColorStop(1,`rgba(${rgb.join(',')},0)`);
+      ctx.fillStyle=g;ctx.fillRect(0,dy,w,edge);
+      g=ctx.createLinearGradient(0,dy+dh-edge,0,dy+dh);g.addColorStop(0,`rgba(${rgb.join(',')},0)`);g.addColorStop(1,color);
+      ctx.fillStyle=g;ctx.fillRect(0,dy+dh-edge,w,edge+1);
+    }else{
+      const scale=Math.max(w/frame.bitmap.width,h/frame.bitmap.height);
+      const dw=frame.bitmap.width*scale,dh=frame.bitmap.height*scale;
+      ctx.drawImage(frame.bitmap,(w-dw)/2,(h-dh)/2,dw,dh);
+    }
+    this.lastDrawnFrame=key;this.hero.dataset.renderedFrame=String(frame.n);
+    this.hero.classList.add('sequence-ready');
+  }
+
+  async warmSequence() {
+    // Warm compressed HTTP cache with bounded concurrency, never decode the film
+    // into hundreds of full-resolution bitmaps (mobile memory stays bounded).
+    const variant=this.frameVariant;
+    let cursor=0;
+    const worker=async()=>{
+      while(cursor<this.frameCount&&!this.destroyed){
+        const n=cursor++;
+        try{
+          const r=await fetch(`assets/sequence/${variant}/f${String(n).padStart(3,'0')}.webp`,{cache:'force-cache',priority:'low',signal:this.mediaAbort.signal});
+          if(r.ok)await r.arrayBuffer();
+        }catch(e){if(e.name==='AbortError')return;}
+      }
+    };
+    await Promise.all([worker(),worker()]);
+  }
+
+  initNavigation() {
+    this.navAbort = new AbortController();
+    const signal = this.navAbort.signal;
+    const menu = document.querySelector('.goom-menu');
+    const nav = document.querySelector('.goom-nav');
+    const closeMenu = () => { this.header.classList.remove('menu-open'); menu?.setAttribute('aria-expanded','false'); };
+    if (menu && nav) {
+      nav.id = 'main-navigation';
+      menu.setAttribute('aria-controls',nav.id);
+      menu.setAttribute('aria-expanded','false');
+      menu.addEventListener('click',() => {
+        const open = this.header.classList.toggle('menu-open');
+        menu.setAttribute('aria-expanded',String(open));
+      },{signal});
+      document.addEventListener('keydown',event => { if(event.key==='Escape'){closeMenu();menu.focus();} },{signal});
+    }
+    document.addEventListener('click',event => {
+      const chapter = event.target.closest('[data-chapter]');
+      const anchor = event.target.closest('a[href^="#"]');
+      if (!chapter && !anchor) return;
+      closeMenu();
+      const id = anchor?.getAttribute('href');
+      if (chapter || id === '#formulas') {
+        event.preventDefault();
+        const beat = chapter ? [0,.27,.425][Number(chapter.dataset.chapter)] : .425;
+        if (beat===.425 && this.formulaActive!==2) this.goToFormula(2);
+        const top = this.reduced && beat===.425 ? this.journeyFormula.getBoundingClientRect().top+scrollY : this.hero.getBoundingClientRect().top+scrollY+beat*this.journeyLayout.span;
+        window.scrollTo({top,behavior:this.reduced?'instant':'smooth'});
+      }
+    },{signal});
+    this.formulaSection?.addEventListener('keydown',event => {
+      if (!event.target.closest('.formula-node,.formula-item')) return;
+      const step = event.key==='ArrowRight'?1:event.key==='ArrowLeft'?-1:0;
+      if (!step) return;
+      event.preventDefault();
+      const next = (this.formulaActive+step+this.formulaTotal)%this.formulaTotal;
+      this.goToFormula(next,true);
+      this.formulaNodes[next].focus();
+    },{signal});
+    if (location.hash === '#formulas') requestAnimationFrame(() => {
+      window.scrollTo({top:this.hero.getBoundingClientRect().top+scrollY+this.journeyLayout.span*.425,behavior:'instant'});
+    });
+    let wheelSum=0, lastWheel=0, gestureLocked=false;
+    this.hero.addEventListener('wheel',event=>{
+      if(this.reduced||event.ctrlKey||Math.abs(event.deltaX)>Math.abs(event.deltaY))return;
+      const now=performance.now();
+      if(now-lastWheel>220){gestureLocked=false;wheelSum=0;}
+      lastWheel=now;
+      const p=this.targetProgress;
+      if(p<.419||p>1||this.hero.getBoundingClientRect().bottom<innerHeight-2)return;
+      const beat=Number(this.hero.dataset.formulaBeat||0),dir=Math.sign(event.deltaY);
+      if(beat===4&&dir>0){
+        event.preventDefault();
+        if(!gestureLocked){gestureLocked=true;scrollTo({top:this.hero.getBoundingClientRect().top+scrollY+this.hero.offsetHeight,behavior:'smooth'});}
+        return;
+      }
+      if(beat===0&&dir<0){
+        if(gestureLocked)event.preventDefault();
+        return;
+      }
+      event.preventDefault();
+      if(gestureLocked)return;
+      wheelSum+=event.deltaY*(event.deltaMode===1?16:event.deltaMode===2?innerHeight:1);
+      if(Math.abs(wheelSum)<35)return;
+      gestureLocked=true;wheelSum=0;
+      this.goToFormula([2,3,4,0,1][beat+dir],true);
+    },{passive:false,signal});
+    let verticalGesture=null;
+    this.hero.addEventListener('touchstart',event=>{
+      if(this.reduced||event.touches.length!==1||this.targetProgress<.419||this.hero.getBoundingClientRect().bottom<innerHeight-2)return;
+      verticalGesture={x:event.touches[0].clientX,y:event.touches[0].clientY,beat:Number(this.hero.dataset.formulaBeat||0),captured:false};
+    },{passive:true,signal});
+    this.hero.addEventListener('touchmove',event=>{
+      const g=verticalGesture;if(!g||event.touches.length!==1)return;
+      const dx=event.touches[0].clientX-g.x,dy=g.y-event.touches[0].clientY;
+      if(Math.abs(dy)<8||Math.abs(dx)>Math.abs(dy))return;
+      if(g.beat===0&&dy<0)return;
+      event.preventDefault();g.captured=true;
+    },{passive:false,signal});
+    this.hero.addEventListener('touchend',event=>{
+      const g=verticalGesture;verticalGesture=null;if(!g?.captured)return;
+      const dy=g.y-event.changedTouches[0].clientY;
+      if(g.beat===4&&dy>40){scrollTo({top:this.hero.getBoundingClientRect().top+scrollY+this.hero.offsetHeight,behavior:'smooth'});return;}
+      if(Math.abs(dy)>40)this.goToFormula([2,3,4,0,1][this.clamp(g.beat+Math.sign(dy),0,4)],true);
+    },{passive:true,signal});
+    this.hero.addEventListener('touchcancel',()=>{verticalGesture=null;},{passive:true,signal});
+    let touchX = null, touchY = null;
+    this.formulaStage?.addEventListener('touchstart',event => {touchX=event.touches[0].clientX;touchY=event.touches[0].clientY;},{passive:true,signal});
+    this.formulaStage?.addEventListener('touchend',event => {
+      if(touchX===null)return;
+      const dx=event.changedTouches[0].clientX-touchX,dy=event.changedTouches[0].clientY-touchY;
+      if(Math.abs(dx)>45 && Math.abs(dx)>Math.abs(dy)*1.5) this.goToFormula((this.formulaActive+(dx<0?1:-1)+5)%5,true);
+      touchX=null;
+    },{passive:true,signal});
+  }
+
+  initRitual() {
+    const section = document.querySelector('.ritual');
+    if (!section) return;
+    const images = [...section.querySelectorAll('[data-ritual-product]')];
+    const buttons = [...section.querySelectorAll('[data-ritual]')];
+    const notes = ['פותחים את היום בצבע. B12 + D3 + B9.','רגע לעצמך, בקצב שלך. Flow.','מורידים הילוך בסוף היום. Deep Sleep.'];
+    const select = active => {
+      images.forEach((img,i) => {
+        const offset=(i-active+3)%3;
+        const x=[0,-115,115][offset], z=[100,-100,-130][offset], rot=[-8,-19,16][offset];
+        img.style.transform=`translate(-50%,-50%) translate3d(${x}%,${offset?6:0}%,${z}px) rotate(${rot}deg)`;
+        img.style.opacity=offset?'.65':'1';
+        img.style.zIndex=offset?'1':'3';
+      });
+      buttons.forEach((button,i)=>button.setAttribute('aria-pressed',String(i===active)));
+      section.querySelector('[data-ritual-note]').textContent=notes[active];
+    };
+    buttons.forEach((button,i)=>button.addEventListener('click',()=>select(i)));
+    select(0);
+  }
+
+  initFaq() {
+    const list = document.querySelector('[data-faq]');
+    if (!list) return;
+    list.addEventListener('click', event => {
+      const button = event.target.closest('[data-faq-q]');
+      if (!button) return;
+      const item = button.parentElement;
+      const open = item.classList.toggle('is-open');
+      button.setAttribute('aria-expanded', String(open));
+      [...list.children].forEach(other => {
+        if (other === item) return;
+        other.classList.remove('is-open');
+        other.querySelector('[data-faq-q]')?.setAttribute('aria-expanded', 'false');
+      });
+    });
+  }
+
+  initReveals() {
+    const elements=[...document.querySelectorAll('[data-reveal]')];
+    if (this.reduced||!('IntersectionObserver' in window)) { elements.forEach(el=>el.classList.add('is-visible')); return; }
+    this.revealObserver=new IntersectionObserver((entries,observer)=>entries.forEach(entry=>{ if(!entry.isIntersecting)return; entry.target.classList.add('is-visible'); observer.unobserve(entry.target); }),{threshold:.1,rootMargin:'0px 0px -8% 0px'});
+    elements.forEach((el,index)=>{ if(!el.classList.contains('how-card')) el.style.transitionDelay=`${(index%4)*55}ms`; this.revealObserver.observe(el); });
+  }
+
+  /* ---------- Formula stage ---------- */
+  initFormula() {
+    const section = document.querySelector('[data-formula]');
+    if (!section) return;
+    const rail = section.querySelector('[data-formula-rail]');
+    const stage = section.querySelector('.formula-stage');
+    const caption = section.querySelector('[data-formula-caption]');
+    const nodes = section.querySelector('.formula-nodes');
+    const fill = section.querySelector('[data-track-fill]');
+    const blob = section.querySelector('.formula-plate');
+    if (!rail || !caption || !nodes || !fill) return;
+
+    this.formulas = [
+      { id:'b12', ink:'#8a5a00', img:'assets/p-b12.png', accent:'#e0a012', label:'B12+D3+B9', name:'B12+D3+B9',
+        kicker:'5-IN-1 · PASSION FRUIT',
+        line:'האנרגיה של היום־יום, בלי הצניחה של אחרי הצהריים.',
+        bullets:['B12, D3, B9, אבץ וברזל','60 גומיות בטעם פסיפלורה','גומי אחד ביום, בלי כוס מים'] },
+      { id:'grow', ink:'#175a86', img:'assets/p-grow.png', accent:'#2f9fe0', label:'Grow', name:'Grow',
+        kicker:'MEN · BERRY',
+        line:'ביוטין, אבץ ו־B12 לשיער, לעור ולציפורניים.',
+        bullets:['ביוטין + אבץ + B12','60 גומיות בטעם פירות יער','מותאם לשגרה של גברים'] },
+      { id:'flow', ink:'#a33512', img:'assets/flow-clean.png', accent:'#f45f2b', label:'Flow', name:'Flow',
+        kicker:'2-IN-1 · TUTTI FRUTTI',
+        line:'פרוביוטיקה וסיבים פרהביוטיים לעיכול מאוזן ולתחושת קלילות.',
+        bullets:['פרוביוטיקה + סיבים פרהביוטיים','60 גומיות בטעם טוטי פרוטי','הפורמולה הנמכרת ביותר שלנו'] },
+      { id:'shine', ink:'#8d1a14', img:'assets/p-shine.png', accent:'#e0342c', label:'Shine', name:'Shine',
+        kicker:'3-IN-1 · MIXED BERRIES',
+        line:'קולגן וחומצה היאלורונית לזוהר שרואים מבפנים החוצה.',
+        bullets:['קולגן + חומצה היאלורונית','40 גומיות בטעם פירות יער','משלים יפה את Flow'] },
+      { id:'sleep', ink:'#392c96', img:'assets/p-sleep.png', accent:'#5b4bd6', label:'Deep Sleep', name:'Deep Sleep',
+        kicker:'5-IN-1 · LAVENDER',
+        line:'מלטונין, מגנזיום ו־L־תיאנין ללילה שקט ולבוקר צלול.',
+        bullets:['מלטונין + L־תיאנין + מגנזיום','60 גומיות בטעם לבנדר','לקחת כחצי שעה לפני השינה'] }
+    ];
+
+    const total = this.formulas.length;
+    this.formulaActive = -1;
+    this.formulaItems = this.formulas.map((f, index) => {
+      const item = document.createElement('button');
+      item.type = 'button';
+      item.className = 'formula-item';
+      item.dataset.index = String(index);
+      item.setAttribute('aria-label', `הצגת פורמולת ${f.name}`);
+      item.innerHTML = `<img src="${f.img}" alt="${f.name}" loading="lazy" decoding="async">`;
+      item.addEventListener('click', () => this.goToFormula(index, true));
+      rail.appendChild(item);
+      return item;
+    });
+
+    this.formulaNodes = this.formulas.map((f, index) => {
+      const node = document.createElement('button');
+      node.type = 'button';
+      node.className = 'formula-node';
+      node.setAttribute('role', 'tab');
+      node.id = 'formula-tab-' + index;
+      node.setAttribute('aria-controls','formula-panel');
+      node.setAttribute('aria-label', f.name);
+      node.innerHTML = `<i></i><span>${f.label}</span>`;
+      node.addEventListener('click', () => this.goToFormula(index, true));
+      nodes.appendChild(node);
+      return node;
+    });
+    this.formulaFill = fill;
+    this.formulaCaption = caption;
+    caption.id = 'formula-panel';
+    caption.setAttribute('role','tabpanel');
+    this.formulaSection = section;
+    this.formulaStage = stage;
+    this.formulaBlob = blob;
+    this.formulaTotal = total;
+
+    /* Bottles ride a 3D ring: the active one faces front, the rest wrap around
+       the sides and back, so the group stays balanced whichever one is picked. */
+    this.layoutFormula = () => {
+      if (this.formulaActive < 0) return;
+      const width = stage ? stage.clientWidth : window.innerWidth;
+      const rx = Math.min(width * 0.42, 432);
+      const rz = 620;
+      const arc = (Math.PI * 2) / total;
+      this.formulaItems.forEach((item, index) => {
+        let offset = index - this.formulaActive;
+        offset -= Math.round(offset / total) * total;
+        const angle = offset * arc;
+        const distance = Math.abs(offset);
+        item.style.setProperty('--x', `${rx * Math.sin(angle)}px`);
+        item.style.setProperty('--y', `${distance * 13}px`);
+        item.style.setProperty('--z', `${rz * Math.cos(angle) - rz}px`);
+        item.style.setProperty('--ry', `${-offset * 15}deg`);
+        item.style.zIndex = String(30 - Math.round(distance * 10));
+        item.style.opacity = distance > 1.5 ? '.74' : '1';
+        item.classList.toggle('is-dim', distance > 0.5);
+      });
+    };
+
+    /* Scroll owns the index; the arrows and dots scroll to a beat so the two
+       controls can never disagree about where you are. */
+    this.goToFormula = (index, seek) => {
+      const next = Math.max(0, Math.min(total - 1, index));
+      if(seek&&!this.reduced){
+        const beat=[2,3,4,0,1].indexOf(next);
+        const top=this.hero.getBoundingClientRect().top+scrollY+(.425+beat*.116)*this.journeyLayout.span;
+        scrollTo({top,behavior:'smooth'});
+        return;
+      }
+      if (next === this.formulaActive) return;
+      const first = this.formulaActive < 0;
+      this.formulaActive = next;
+      const data = this.formulas[next];
+      section.style.setProperty('--f-accent', data.accent);
+      section.style.setProperty('--f-accent-ink', data.ink);
+      this.formulaNodes.forEach((node, i) => { node.setAttribute('aria-selected', String(i === next)); node.tabIndex = i === next ? 0 : -1; });
+      this.formulaCaption.setAttribute('aria-labelledby','formula-tab-'+next);
+      this.formulaFill.style.transform = `scaleX(${next / (total - 1)})`;
+      if (this.formulaBlob) this.formulaBlob.style.setProperty('--blob-scale', String(1 + next * 0.014));
+      this.layoutFormula();
+
+      const paint = () => {
+        this.formulaCaption.innerHTML = `<div class="formula-caption-inner">
+          <span class="f-kicker" dir="ltr">${data.kicker}</span>
+          <h3>${data.name}</h3>
+          <p>${data.line}</p>
+          <ul>${data.bullets.map(b => `<li>${b}</li>`).join('')}</ul>
+          <a class="f-cta" href="https://goom.co.il">להזמנת ${data.name}</a>
+        </div>`;
+        this.formulaCaption.classList.remove('is-swapping');
+      };
+      if (first || this.reduced) { paint(); return; }
+      this.formulaCaption.classList.add('is-swapping');
+      clearTimeout(this.captionTimer);
+      this.captionTimer = setTimeout(paint, 200);
+    };
+
+    section.querySelector('[data-f-prev]')?.addEventListener('click', () => this.goToFormula((this.formulaActive + total - 1) % total, true));
+    section.querySelector('[data-f-next]')?.addEventListener('click', () => this.goToFormula((this.formulaActive + 1) % total, true));
+
+    this.updateFormula = () => {};
+    window.addEventListener('resize', this.layoutFormula);
+    this.goToFormula(2);
+  }
+
+  /* ---------- Testimonial ring ---------- */
+  initStories() {
+    const stories = document.querySelector('#stories');
+    const scene = stories?.querySelector('[data-stories-scene]');
+    const ring = stories?.querySelector('[data-ring3d]');
+    const slots = ring ? [...ring.querySelectorAll('[data-slot]')] : [];
+    if (!stories || !scene || !ring || !slots.length) return;
+
+    const count = slots.length;
+    const stepAngle = 360 / count;
+    const speed = 360 / 40000;
+    let angle = 0;
+    let paused = this.reduced;
+    let hovering = false;
+    let dragging = false;
+    let dragStart = 0;
+    let dragAngle = 0;
+    let last = 0;
+
+    const apply = (free) => { ring.classList.toggle('is-free', free !== false); ring.style.transform = `rotateY(${angle}deg)`; };
+    const tick = (now) => {
+      this.storyRaf = requestAnimationFrame(tick);
+      const delta = last ? Math.min(64, now - last) : 0;
+      last = now;
+      if (paused || hovering || dragging || !this.storiesVisible) return;
+      angle -= delta * speed;
+      apply(true);
+    };
+
+    const toggle = stories.querySelector('[data-spin-toggle]');
+    const setPaused = (value) => {
+      paused = value;
+      if (!toggle) return;
+      toggle.setAttribute('aria-pressed', String(paused));
+      toggle.textContent = paused ? 'המשך הסיבוב' : 'עצירת הסיבוב';
+    };
+
+    /* Taking manual control stops the drift — otherwise the card you just
+       stepped to slides away while you are reading it. */
+    const snap = (step) => {
+      setPaused(true);
+      angle = (Math.round(angle / stepAngle) + step) * stepAngle;
+      apply(false);
+    };
+
+    stories.querySelector('[data-arrow="prev"]')?.addEventListener('click', () => snap(1));
+    stories.querySelector('[data-arrow="next"]')?.addEventListener('click', () => snap(-1));
+    toggle?.addEventListener('click', () => setPaused(!paused));
+    if (this.reduced) setPaused(true);
+
+    scene.addEventListener('pointerenter', () => { hovering = true; });
+    scene.addEventListener('pointerleave', () => { hovering = false; });
+    let moved = false;
+    scene.addEventListener('pointerdown', event => {
+      dragging = true;
+      moved = false;
+      dragStart = event.clientX;
+      dragAngle = angle;
+      scene.setPointerCapture?.(event.pointerId);
+    });
+    scene.addEventListener('pointermove', event => {
+      if (!dragging) return;
+      if (Math.abs(event.clientX - dragStart) > 4) moved = true;
+      angle = dragAngle + (event.clientX - dragStart) * 0.28;
+      apply(true);
+    });
+    const endDrag = event => {
+      if (!dragging) return;
+      dragging = false;
+      scene.releasePointerCapture?.(event.pointerId);
+      if (moved) setPaused(true);
+      angle = Math.round(angle / stepAngle) * stepAngle;
+      apply(false);
+    };
+    scene.addEventListener('pointerup', endDrag);
+    scene.addEventListener('pointercancel', endDrag);
+
+    slots.forEach(slot => slot.addEventListener('click', () => {
+      if (moved) return;
+      const video = slot.querySelector('video');
+      if (!video) return;
+      slots.forEach(other => { if (other !== slot) other.querySelector('video')?.pause(); });
+      if (video.paused) { video.preload = 'auto'; video.play().catch(() => {}); }
+      else video.pause();
+    }));
+
+    this.storiesVisible = false;
+    this.storyObserver = new IntersectionObserver(([entry]) => {
+      this.storiesVisible = entry.isIntersecting;
+      if (entry.isIntersecting) stories.classList.add('is-in-view');
+    }, { threshold: 0.08 });
+    this.storyObserver.observe(stories);
+
+    apply(true);
+    this.storyRaf = requestAnimationFrame(tick);
+  }
+
+
+}
+
+const site = new GoomSite();
+site.mount();
+window.addEventListener('pagehide', event => { if (!event.persisted) site.destroy(); });
+window.addEventListener('pageshow', event => { if (event.persisted) site.updateScroll(); });
+window.goomDiagnostics = () => ({
+  frame: site.wantedFrame, renderedFrame: Number(site.hero.dataset.renderedFrame),
+  cachedFrames: site.frameCache.size, pendingFrames: site.framePending.size,
+  variant: site.frameVariant, failedFrames: site.frameFailures.size,
+  progress: site.renderProgress, reducedMotion: site.reduced
+});

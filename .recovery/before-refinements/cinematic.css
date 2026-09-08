@@ -1,0 +1,269 @@
+/* GOOM — three chapters, one continuous product. */
+.hero { height:340svh; background:#cbbbe6; }
+.hero-pin { height:100svh; min-height:560px; isolation:isolate; }
+.journey-scene { position:absolute; inset:0; overflow:hidden; pointer-events:none; will-change:transform,opacity; }
+.journey-lineup { z-index:1; }
+.lineup-plane { position:absolute; }
+.journey-plate { display:block; position:absolute; inset:0; width:100%; height:100%; max-width:none; }
+.lineup-bottle { position:absolute; height:auto; max-width:none; transform:translate(-50%,-50%); filter:drop-shadow(8px 18px 16px #51328928); }
+.lineup-grow { left:40.5%; top:29%; width:9.6%; transform:translate(-50%,-50%) rotate(13deg); }
+.lineup-b12 { left:36.5%; top:66%; width:10.3%; transform:translate(-50%,-50%) rotate(-10deg); }
+.lineup-shine { left:85%; top:39%; width:10%; transform:translate(-50%,-50%) rotate(13deg); }
+.lineup-sleep { left:78%; top:79%; width:10.6%; transform:translate(-50%,-50%) rotate(19deg); }
+.journey-splash { z-index:2; opacity:0; }
+.journey-splash img { width:100%; height:100%; max-width:none; object-fit:cover; }
+.journey-flow { position:absolute; left:0; top:0; width:460px; max-width:none; height:auto; z-index:6; transform-origin:center; will-change:transform; pointer-events:none; filter:drop-shadow(8px 20px 22px #4925792b); }
+.hero-copy { z-index:7; transition:opacity 200ms var(--goom-ease),visibility 200ms; transform:none; }
+.hero-copy[data-scene="1"],.hero-copy[data-scene="1"].is-on { left:5vw; top:50%; bottom:auto; right:auto; width:28vw; max-width:410px; padding:0; background:none; transform:translateY(-50%); text-align:left; }
+.hero-wordmark { display:block; width:min(25vw,36vh); height:auto; margin:0 0 16px; overflow:visible; background:none; color:inherit; }
+.hero-copy h1 { text-align:left; font-size:clamp(26px,2.4vw,38px); }
+.hero-actions { justify-content:flex-end; flex-direction:row-reverse; flex-wrap:wrap; margin-top:26px; gap:10px; }
+.hero-btn { display:inline-flex; justify-content:center; align-items:center; gap:18px; font-size:14px; min-height:48px; padding:12px 22px; }
+.hero-btn.liquid-glass,.hero-btn.ghost.liquid-glass { position:relative; color:#2b1767; border:1px solid #ffffffa6; background:linear-gradient(120deg,#ffffff60,#ffffff14 48%,#ffffff40); backdrop-filter:blur(18px) saturate(160%); -webkit-backdrop-filter:blur(18px) saturate(160%); box-shadow:inset 0 1px 1px #ffffffed,inset 0 -1px 1px #ffffff60,0 6px 22px #573b8123; }
+.hero-btn.liquid-glass::after { content:''; position:absolute; inset:2px; border-radius:inherit; pointer-events:none; border-top:1px solid #ffffff99; border-bottom:1px solid #ffffff50; }
+.hero-btn:active { transform:scale(.97); }
+.hero-copy[data-scene="2"] { left:6vw; top:50%; width:31vw; max-width:500px; transform:translateY(-50%); text-align:right; }
+.hero-copy[data-scene="2"] h2 { font-size:clamp(42px,4.7vw,76px); font-weight:900; line-height:1.02; letter-spacing:-.035em; }
+.hero-copy[data-scene="2"] p { font-size:clamp(16px,1.45vw,23px); line-height:1.5; margin:24px 0; max-width:35ch; }
+.hero-copy[data-scene="2"] .hero-btn { min-width:220px; }
+.hero-tagline { position:absolute; z-index:7; left:5vw; bottom:27px; margin:0; font-family:Arial,sans-serif; letter-spacing:.23em; font-size:10px; font-weight:600; }
+.hero-cue { bottom:28px; font-size:8px; letter-spacing:.22em; gap:8px; }
+.hero-cue i { height:28px; }
+.journey-chapters { position:absolute; bottom:24px; right:4.4vw; z-index:12; display:flex; gap:20px; direction:rtl; }
+.journey-chapters button { display:flex; align-items:center; gap:7px; border:0; background:none; padding:6px 0; cursor:pointer; color:#2b1767; font-size:11px; }
+.journey-chapters i { width:5px; height:5px; border-radius:50%; background:#2b17674a; }
+.journey-chapters [aria-current] i { background:#2b1767; box-shadow:0 0 0 4px #2b176715; }
+.journey-chapters button:not([aria-current]) span { opacity:.6; }
+.journey-formula.formula { position:absolute; inset:0; width:100%; height:100%; background:transparent; z-index:4; opacity:0; pointer-events:none; }
+.journey-formula.is-arrived { pointer-events:auto; }
+.journey-formula .formula-pin { position:absolute; inset:0; height:100%; background:#cbbbe6; }
+.journey-formula .formula-item { transition:transform 500ms var(--goom-move),opacity 200ms var(--goom-ease); }
+.journey-formula:not(.is-arrived) .formula-item { transition:none; }
+.formula-item img { filter:drop-shadow(0 18px 20px #341a6e30); }
+.formula-plate { transition:none; }
+.formula-track { bottom:76px; }
+.formula-arrows { bottom:125px; }
+.formula-head { right:4.4vw; width:27vw; max-width:390px; }
+.formula-head h2 { font-size:clamp(30px,3.05vw,49px); }
+.formula-stage { inset:0 30vw 0 0; }
+.formula-item { width:clamp(190px,19vw,292px); }
+.formula-caption-inner { transition:opacity 180ms var(--goom-ease),transform 180ms var(--goom-ease); }
+.formula-caption .f-cta { margin-top:20px; }
+.ritual { position:relative; display:grid; grid-template-columns:.8fr 1.2fr; min-height:820px; padding:105px 6vw 90px; gap:5vw; overflow:hidden; background:radial-gradient(ellipse at 25% 40%,#f2e8ff,#ddd0ef 65%,#c9b5e5); }
+.ritual-copy { z-index:3; align-self:center; max-width:490px; }
+.ritual .f-eyebrow { font-size:10px; letter-spacing:.24em; color:#6c5694; }
+.ritual h2 { margin:22px 0 24px; font-size:clamp(52px,6.5vw,98px); line-height:.95; letter-spacing:-.05em; font-weight:500; }
+.ritual-copy>p { font-size:18px; line-height:1.65; max-width:36ch; }
+.ritual-options { display:flex; flex-direction:column; align-items:stretch; margin-top:32px; }
+.ritual-options button { text-align:right; padding:15px 0; background:none; border:0; border-bottom:1px solid #2b176723; font-size:17px; cursor:pointer; opacity:.55; transition:opacity 160ms ease; }
+.ritual-options [aria-pressed="true"] { opacity:1; font-weight:700; }
+.ritual-options [aria-pressed="true"]::after { content:'←'; float:left; }
+.ritual-copy .ritual-note { font-size:13px; color:#6f5794; min-height:24px; margin-top:22px; }
+.ritual-link { display:inline-flex; gap:30px; margin-top:14px; padding-bottom:5px; border-bottom:1px solid #2b1767; font-size:14px; }
+.ritual-stage { position:relative; min-width:0; min-height:590px; perspective:1200px; align-self:center; }
+.ritual-products { position:absolute; inset:0; transform-style:preserve-3d; }
+.ritual-products img { position:absolute; left:50%; top:50%; width:clamp(130px,14vw,215px); height:auto; max-width:none; filter:drop-shadow(10px 35px 20px #62439039); transition:transform 500ms var(--goom-move),opacity 200ms ease; }
+.ritual-word { position:absolute; left:-8%; top:6%; color:#a78acc4f; font:bold clamp(64px,8vw,128px)/.88 Arial,sans-serif; letter-spacing:-.075em; }
+.ritual-orbit { position:absolute; width:100%; height:55%; left:0; top:27%; border:18px solid #ffffff50; border-radius:50%; box-shadow:inset 2px 4px 4px #fff9,inset -3px -4px 4px #9d7ac349,2px 5px 7px #68459f23; transform:rotate(-24deg) rotateX(42deg); }
+.orbit-two { width:90%; height:90%; top:5%; left:7%; border-width:2px; transform:rotate(28deg) rotateY(55deg); }
+.ritual-caption { position:absolute; bottom:0; left:50%; transform:translateX(-50%); white-space:nowrap; font:9px Arial,sans-serif; letter-spacing:.28em; }
+#how,#stories,#about,#faq,#ritual { scroll-margin-top:95px; }
+@media (hover:hover) and (pointer:fine) {
+  .hero-btn.liquid-glass:hover { background:linear-gradient(120deg,#ffffff88,#ffffff30 48%,#ffffff66); color:#2b1767; transform:translateY(-2px); }
+  .ritual-options button:hover { opacity:1; }
+}
+@media (max-width:900px) {
+  .goom-header.menu-open .goom-nav { position:absolute; top:calc(100% + 12px); right:0; left:0; display:flex; flex-direction:column; align-items:stretch; padding:18px 24px; gap:0; background:#ede3f7f2; backdrop-filter:blur(20px); border:1px solid #fff9; border-radius:24px; box-shadow:0 16px 35px #462e7825; }
+  .goom-header.menu-open .goom-nav a { display:block; padding:12px 0; }
+  .goom-bar { min-height:54px; }
+  .formula-head { top:50%; width:28vw; padding:0; display:block; right:4vw; left:auto; bottom:auto; transform:translateY(-50%); }
+  .formula-head h2 { font-size:30px; }
+  .formula-caption { margin-top:24px; }
+  .formula-item { top:46%; width:23vw; }
+  .formula-stage { inset:0 30vw 0 0; }
+  .formula-node span { display:block; }
+  .ritual { min-height:720px; }
+}
+@media (max-width:900px) {
+  .hero { height:320svh; }
+  .hero-pin { height:100svh; min-height:600px; }
+  .hero-copy[data-scene="1"],.hero-copy[data-scene="1"].is-on { left:6vw; top:11.5%; width:88vw; max-width:none; transform:none; padding:0; }
+  .hero-wordmark { display:block; width:44vw; max-width:220px; height:auto; margin:0 0 10px; }
+  .hero-copy h1 { font-size:clamp(22px,5.5vw,31px); }
+  .hero-actions { position:fixed; left:0; top:calc(100svh - 11.5svh - 127px); width:88vw; flex-wrap:nowrap; gap:8px; margin:0; justify-content:flex-start; }
+  .hero-btn { padding:11px 16px; gap:10px; min-height:46px; font-size:12px; }
+  .hero-copy[data-scene="2"] { left:7vw; right:7vw; top:12%; width:auto; max-width:none; transform:none; }
+  .hero-copy[data-scene="2"] h2 { font-size:clamp(34px,9vw,48px); max-width:12ch; margin-right:0; }
+  .hero-copy[data-scene="2"] .f-eyebrow { font-size:9px; margin-bottom:12px; }
+  .hero-copy[data-scene="2"] p { font-size:15px; max-width:35ch; line-height:1.45; margin:14px 0; }
+  .hero-copy[data-scene="2"] .hero-btn { min-width:165px; }
+  .journey-splash { overflow:visible; }
+  .journey-splash img { position:absolute; bottom:0; height:69%; object-position:74% 50%; mask-image:linear-gradient(transparent,#000 18%); }
+  .hero-tagline { left:0; right:0; text-align:center; bottom:59px; font-size:8px; letter-spacing:.18em; }
+  .hero-cue { display:none; }
+  .journey-chapters { bottom:14px; left:0; right:0; justify-content:center; gap:24px; }
+  .journey-chapters button { font-size:10px; padding:8px 0; }
+  .journey-formula .formula-head { inset:91px 6vw auto; width:auto; max-width:none; padding:0; transform:none; display:block; pointer-events:none; }
+  .formula-head .f-eyebrow { font-size:9px; margin-bottom:9px; }
+  .formula-head h2 { font-size:32px; line-height:1.02; }
+  .formula-head .f-rule { display:none; }
+  .formula-stage { inset:0; perspective:1100px; }
+  .formula-item { top:43%; width:35vw; max-width:185px; }
+  .formula-caption { position:absolute; top:calc(100svh - 91px - 264px); right:0; width:88vw; padding:0; margin:0; min-height:0; }
+  .formula-caption .f-kicker { font-size:9px; margin:0 0 8px; }
+  .formula-caption h3 { font-size:27px; }
+  .formula-caption p { font-size:14px; margin:7px 0 0; max-width:28ch; }
+  .formula-caption ul { display:none; }
+  .formula-caption .f-cta { pointer-events:auto; margin-top:12px; min-height:42px; padding:9px 21px; font-size:12px; }
+  .formula-track { bottom:71px; left:8vw; right:8vw; }
+  .formula-node span { display:block; font-size:8px; letter-spacing:.04em; white-space:nowrap; }
+  .formula-arrows { bottom:130px; left:6vw; gap:7px; }
+  .formula-arrow { width:42px; height:42px; }
+  .formula-plate { object-fit:cover; object-position:50% 50%; }
+  .ritual { grid-template-columns:1fr; padding:66px 7vw 55px; gap:5px; }
+  .ritual-copy { max-width:none; }
+  .ritual h2 { font-size:64px; margin:18px 0; }
+  .ritual-copy>p { font-size:16px; }
+  .ritual-options { margin-top:20px; }
+  .ritual-options button { font-size:15px; padding:13px 0; }
+  .ritual-stage { grid-row:2; min-height:450px; margin-top:28px; }
+  .ritual-products img { width:30vw; max-width:165px; }
+  .ritual-word { left:0; font-size:17vw; }
+  .ritual-caption { bottom:8px; }
+}
+@media (max-width:380px) {
+  .hero-actions { gap:6px; }
+  .hero-btn { padding:11px 12px; font-size:11px; }
+  .hero-copy[data-scene="2"] h2 { font-size:33px; }
+  .hero-copy[data-scene="2"] p { font-size:14px; }
+  .formula-head h2 { font-size:29px; }
+}
+@media (max-height:700px) and (min-width:901px) {
+  .hero-wordmark { width:24vh; }
+  .hero-copy h1 { font-size:26px; }
+  .formula-head h2 { font-size:30px; }
+  .formula-head .f-rule { margin-block:16px; }
+  .formula-caption ul { display:none; }
+}
+@media (prefers-reduced-motion:reduce) {
+  .hero { height:auto; }
+  .hero-pin { position:relative; height:auto; min-height:0; overflow:hidden; }
+  .journey-lineup { height:100svh; min-height:600px; }
+  .journey-flow { display:none; }
+  .hero-copy[data-scene="1"] { position:relative; top:auto; transform:none; min-height:100svh; padding-top:100px; }
+  .hero-copy[data-scene="1"].is-on { transform:none; }
+  .journey-splash,.hero-copy[data-scene="2"],.journey-chapters,.hero-tagline { display:none; }
+  .journey-formula.formula { position:relative; height:100svh; min-height:680px; opacity:1; pointer-events:auto; }
+  .journey-formula .formula-item { visibility:visible!important; }
+  .ritual-products img,.hero-copy { transition:opacity 160ms ease; }
+  .hero-actions { position:static; margin-top:24px; }
+}
+/* Keep the restored mark aligned to the reference's left edge in RTL. */
+.hero-wordmark { margin-right:auto; margin-left:0; }
+.hero-actions { justify-content:flex-start; }
+.lineup-flow-static { display:none; }
+.journey-tether { position:absolute; top:0; left:0; width:300px; height:800px; z-index:5; pointer-events:none; transform-origin:0 0; opacity:0; will-change:transform; }
+.journey-tether svg { display:block; width:100%; height:100%; overflow:visible; }
+.journey-lineup { mask-image:linear-gradient(#000 0%,#000 87%,transparent 100%); }
+.journey-splash { mask-image:linear-gradient(transparent,#000 8%,#000 100%); }
+.journey-chapters { padding:2px 13px; border-radius:30px; background:#decdef66; backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); }
+@media (min-width:901px) {
+  .hero-copy[data-scene="1"],.hero-copy[data-scene="1"].is-on { width:25vw; }
+  .hero-wordmark { width:min(24vw,36vh); }
+  .hero-actions { max-width:25vw; }
+}
+@media (max-width:900px) {
+  .journey-plate { mask-image:linear-gradient(transparent,#000 13%,#000 82%,transparent); transform:scaleY(1.3); }
+  .hero-actions { position:absolute; top:calc(100svh - 11.5svh - 113px); left:0; width:88vw; justify-content:flex-start; }
+  .hero-wordmark { width:43vw; }
+  .journey-chapters { left:5vw; right:5vw; gap:18px; }
+  .hero-tagline { bottom:50px; }
+  .hero-copy[data-scene="1"] h1 { font-size:24px; }
+}
+@media (prefers-reduced-motion:reduce) {
+  .journey-tether { display:none; }
+  .lineup-flow-static { display:block; left:62%; top:51%; width:16.3%; transform:translate(-50%,-50%) rotate(14deg); z-index:2; }
+  .hero-copy[data-scene="1"],.hero-copy[data-scene="1"].is-on { position:relative; top:auto; transform:none; padding-top:100px; min-height:100svh; }
+  .hero-copy[data-scene="2"],.hero-copy[data-scene="2"].is-on { display:block; position:relative; inset:auto; width:100%; max-width:none; min-height:100svh; padding:120px 6vw 80px; transform:none; background:#ccbbe8 url('assets/bg-c.jpg') center/cover; }
+  .hero-copy[data-scene="2"] h2,.hero-copy[data-scene="2"] p { max-width:32vw; margin-left:auto; margin-right:58vw; }
+  .hero-copy[data-scene="2"]::after { content:''; position:absolute; top:24%; right:20%; width:23%; height:60%; background:url('assets/flow-clean.png') center/contain no-repeat; transform:rotate(14deg); pointer-events:none; }
+  .hero-copy[data-scene="2"] .f-eyebrow { display:none; }
+  .hero-copy[data-scene="2"] .hero-btn { margin-right:58vw; }
+  .hero-actions { position:static; margin-top:25px; }
+  .hero-pin .journey-formula { transform:none!important; }
+}
+@media (prefers-reduced-motion:reduce) and (max-width:900px) {
+  .hero-copy[data-scene="2"] { padding-top:90px; }
+  .hero-copy[data-scene="2"] h2,.hero-copy[data-scene="2"] p { max-width:88vw; margin-right:0; }
+  .hero-copy[data-scene="2"] .hero-btn { margin-right:0; }
+  .hero-copy[data-scene="2"]::after { top:48%; right:30%; width:40%; height:45%; }
+}
+@media (orientation:landscape) and (max-height:500px) {
+  .hero-pin { min-height:0; }
+  .hero-copy[data-scene="1"],.hero-copy[data-scene="1"].is-on { top:24%; width:27vw; left:5vw; transform:none; }
+  .hero-wordmark { width:24vh; }
+  .hero-copy[data-scene="1"] h1 { font-size:20px; }
+  .hero-actions { position:static; width:auto; margin-top:12px; flex-wrap:wrap; }
+  .hero-btn { min-height:35px; padding:8px 15px; font-size:11px; }
+  .hero-copy[data-scene="2"] { top:26%; left:5vw; right:auto; width:36vw; transform:none; }
+  .hero-copy[data-scene="2"] h2 { font-size:30px; }
+  .hero-copy[data-scene="2"] p { font-size:12px; margin-block:12px; }
+  .hero-copy[data-scene="2"] .f-eyebrow { display:none; }
+  .hero-tagline { bottom:20px; width:40vw; right:auto; font-size:7px; }
+  .journey-chapters { bottom:13px; right:3vw; left:auto; gap:12px; }
+  .journey-splash img { height:100%; mask-image:none; }
+  .journey-formula .formula-head { top:24%; right:5vw; left:auto; width:30vw; transform:none; }
+  .formula-head .f-eyebrow,.formula-head .f-rule,.formula-caption ul { display:none; }
+  .formula-head h2 { font-size:24px; }
+  .formula-caption { position:static; width:auto; margin-top:15px; min-height:0; }
+  .formula-caption h3 { font-size:20px; }
+  .formula-caption p { font-size:12px; line-height:1.3; }
+  .formula-caption .f-cta { min-height:32px; padding:6px 16px; margin-top:9px; }
+  .formula-caption .f-kicker { font-size:8px; margin-bottom:6px; }
+  .formula-stage { inset:0 32vw 0 0; }
+  .formula-item { top:46%; width:28vh; }
+  .formula-track { left:6vw; right:6vw; bottom:57px; }
+  .formula-arrows { left:5vw; bottom:83px; }
+  .formula-arrow { width:32px; height:32px; }
+}
+@media (hover:none) {
+  .hero-btn:hover { transform:none; }
+}
+@media (max-width:900px) and (orientation:portrait) {
+  .ritual { display:flex; flex-direction:column; gap:0; }
+  .ritual-copy { display:contents; }
+  .ritual-copy>.f-eyebrow { order:0; }
+  .ritual-copy>h2 { order:1; font-size:60px; }
+  .ritual-copy>p:not(.ritual-note) { order:2; margin:8px 0 0; }
+  .ritual-stage { order:3; align-self:stretch; min-height:340px; margin:10px 0 0; }
+  .ritual-options { order:4; flex-direction:row; justify-content:space-between; gap:8px; margin-top:12px; }
+  .ritual-options button { font-size:12px; flex:1; text-align:center; }
+  .ritual-options [aria-pressed="true"]::after { display:none; }
+  .ritual-copy>.ritual-note { order:5; font-size:12px; margin:14px 0 0; }
+  .ritual-copy>.ritual-link { order:6; align-self:flex-start; margin-top:14px; }
+}
+@media (max-width:380px) {
+  .formula-item { width:31vw; }
+  .formula-caption { top:calc(100svh - 91px - 250px); }
+}
+@media (prefers-reduced-motion:reduce) and (max-width:900px) and (orientation:portrait) {
+  .hero-copy[data-scene="1"],.hero-copy[data-scene="1"].is-on { left:0; right:auto; width:100%; padding:100px 6vw 0; }
+  .hero-copy[data-scene="1"] .hero-actions { position:absolute; top:auto; bottom:80px; left:6vw; width:88vw; margin:0; }
+}
+/* Native source sequence replaces the previous layered recreation. */
+.source-sequence { position:absolute; inset:0; z-index:5; pointer-events:none; }
+.source-canvas,.source-poster { position:absolute; inset:0; width:100%; height:100%; display:block; object-fit:cover; }
+.source-canvas { opacity:0; }
+.sequence-ready .source-canvas { opacity:1; }
+.sequence-ready .source-poster { opacity:0; }
+.uses-source-sequence .journey-lineup,
+.uses-source-sequence .journey-splash,
+.uses-source-sequence .journey-flow,
+.uses-source-sequence .journey-tether { display:none; }
+.uses-source-sequence .journey-formula { z-index:6; }
+.uses-source-sequence .hero-copy { z-index:7; }
+@media (prefers-reduced-motion:reduce) {
+  .source-sequence { height:100svh; }
+  .uses-source-sequence .journey-lineup { display:block; }
+  .source-canvas,.source-poster { display:none; }
+}
