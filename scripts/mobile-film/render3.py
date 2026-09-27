@@ -161,5 +161,7 @@ for n,f in enumerate(frames):
         img=vblur(env,vy*0.5)*(1-al)+col*al
     else:
         img=r; prev=cv2.cvtColor(cv2.resize(img,(213,461)).astype(np.uint8),cv2.COLOR_BGR2GRAY).astype(np.float32)
-    cv2.imwrite(f'{OUT}/f{n:03d}.webp',np.clip(img,0,255).astype(np.uint8),[cv2.IMWRITE_WEBP_QUALITY,Q])
+    out8=np.clip(img,0,255).astype(np.uint8)
+    out8=cv2.resize(out8,(720,1560),interpolation=cv2.INTER_AREA)
+    cv2.imwrite(f'{OUT}/f{n:03d}.webp',out8,[cv2.IMWRITE_WEBP_QUALITY,Q])
 json.dump({'width':W,'height':H,'count':len(frames),'marks':SC},open(f'{OUT}/manifest.json','w'))

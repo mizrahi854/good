@@ -186,7 +186,7 @@
   .hero-copy[data-scene="1"],.hero-copy[data-scene="1"].is-on { position:relative; top:auto; transform:none; padding-top:100px; min-height:100svh; }
   .hero-copy[data-scene="2"],.hero-copy[data-scene="2"].is-on { display:block; position:relative; inset:auto; width:100%; max-width:none; min-height:100svh; padding:120px 6vw 80px; transform:none; background:#ccbbe8 url('assets/bg-c.jpg') center/cover; }
   .hero-copy[data-scene="2"] h2,.hero-copy[data-scene="2"] p { max-width:32vw; margin-left:auto; margin-right:58vw; }
-  .hero-copy[data-scene="2"]::after { content:''; position:absolute; top:24%; right:20%; width:23%; height:60%; background:url('assets/flow-clean.png') center/contain no-repeat; transform:rotate(14deg); pointer-events:none; }
+  .hero-copy[data-scene="2"]::after { content:''; position:absolute; top:24%; right:20%; width:23%; height:60%; background:url('assets/flow-clean.webp') center/contain no-repeat; transform:rotate(14deg); pointer-events:none; }
   .hero-copy[data-scene="2"] .f-eyebrow { display:none; }
   .hero-copy[data-scene="2"] .hero-btn { margin-right:58vw; }
   .hero-actions { position:static; margin-top:25px; }

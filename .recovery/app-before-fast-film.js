@@ -35,8 +35,6 @@ class GoomSite {
     clearTimeout(this.captionTimer);
     this.revealObserver?.disconnect();
     this.motionObserver?.disconnect();
-    this.videoObserver?.disconnect();
-    this.posterObserver?.disconnect();
     this.storyObserver?.disconnect();
     if (this.layoutFormula) window.removeEventListener('resize', this.layoutFormula);
     this.journeyResize?.disconnect();
@@ -47,14 +45,13 @@ class GoomSite {
     cancelAnimationFrame(this.sequenceRaf);
     cancelAnimationFrame(this.decodeRaf);
     this.frameCache?.forEach(frame=>frame.bitmap.close());
-    this.stopFilm?.();
   }
 
   clamp(value,min=0,max=1) { return Math.min(max,Math.max(min,value)); }
 
   updateScroll() {
     this.updateHero();
-    if(this.frameVariant==='mobile-film-v4'&&this.journeyFormula){
+    if(this.frameVariant==='mobile-film-v3'&&this.journeyFormula){
       // the chapter pill stays with the film and the formulas, then gets out of the way
       document.documentElement.classList.toggle('chapters-away',this.journeyFormula.getBoundingClientRect().bottom<innerHeight*.72);
     }
@@ -85,14 +82,14 @@ class GoomSite {
       const w=pin.clientWidth,h=this.reduced?Math.max(600,innerHeight):pin.clientHeight;
       if(this.journeyLayout?.w===w&&this.journeyLayout?.h===h)return;
       const mobile=true;
-      const film=this.mobileFilmQuery.matches&&!this.reduced;
-      const dpr=film?Math.min(devicePixelRatio||1,2,760/Math.max(1,w)):Math.min(devicePixelRatio||1,2);
+      const dpr=Math.min(devicePixelRatio||1,2);
       this.canvas.width=Math.round(w*dpr);this.canvas.height=Math.round(h*dpr);
       this.ctx.imageSmoothingEnabled=true;this.ctx.imageSmoothingQuality='high';
       // Phones get the dedicated portrait film (hero -> through the bubble -> splash -> formulas).
       // Toggle first: the class sets the section height the scroll span is measured from.
+      const film=this.mobileFilmQuery.matches;
       this.hero.classList.toggle('is-mobile-film',film);
-      this.frameVariant=film?'mobile-film-v4':'portrait';this.frameCount=film?134:240;
+      this.frameVariant=film?'mobile-film-v3':'portrait';this.frameCount=film?134:240;
       document.documentElement.classList.toggle('has-mobile-film',film);
       // the chapter pill must float above the formulas section too, so it leaves the pinned stage on phones
       const rail=this.chapters[0]?.parentElement;
@@ -100,13 +97,12 @@ class GoomSite {
         else if(!film&&rail.parentElement===document.body)this.hero.querySelector('.hero-pin').insertBefore(rail,this.cue); }
       this.journeyLayout={w,h,mobile,dpr,span:Math.max(1,this.hero.offsetHeight-h)};
       this.lastDrawnFrame=null;
-      if(film)this.startFilm();else this.stopFilm();
       this.updateHero();this.applySourceProgress(this.renderProgress);
     };
     this.journeyResize=new ResizeObserver(this.measureJourney);
     this.journeyResize.observe(this.hero.querySelector('.hero-pin'));
     this.measureJourney();
-    if (!this.reduced&&!this.film) fetch('assets/sequence/manifest.json',{signal:this.mediaAbort.signal})
+    if (!this.reduced) fetch('assets/sequence/manifest.json',{signal:this.mediaAbort.signal})
       .then(r=>{if(!r.ok)throw new Error('Sequence manifest');return r.json()})
       .then(data=>{this.sequenceManifest=data;this.lastDrawnFrame=null;this.applySourceProgress(this.renderProgress);})
       .catch(()=>{});
@@ -121,7 +117,7 @@ class GoomSite {
     const tick=now=>{
       this.sequenceRaf=0;if(this.destroyed)return;
       const dt=previous?Math.min(64,now-previous):16.7;previous=now;
-      this.renderProgress+=(this.targetProgress-this.renderProgress)*(1-Math.exp(-dt/(this.film?14:32)));
+      this.renderProgress+=(this.targetProgress-this.renderProgress)*(1-Math.exp(-dt/(this.frameVariant==='mobile-film-v3'?70:32)));
       if(Math.abs(this.targetProgress-this.renderProgress)<.0004)this.renderProgress=this.targetProgress;
       this.applySourceProgress(this.renderProgress);
       if(this.renderProgress!==this.targetProgress)this.sequenceRaf=requestAnimationFrame(tick);
@@ -132,7 +128,7 @@ class GoomSite {
   // Shorten the establishing holds, preserve every filmed movement in order.
   // No synthetic bottle transform replaces the native liquid / ring sequence.
   sourceFrameAt(p) {
-    if(this.frameVariant==='mobile-film-v4'){
+    if(this.frameVariant==='mobile-film-v3'){
       // Three rests: hero -> bottle raised -> orange splash -> formulas. Holds give each scroll stop a still frame.
       const film=[[0,0],[.03,0],[.16,20],[.21,20],[.52,82],[.64,98],[.97,132],[1,133]];
       for(let i=1;i<film.length;i++){
@@ -154,7 +150,7 @@ class GoomSite {
     const frame=this.sourceFrameAt(p);
     const {mobile}=this.journeyLayout;
     this.wantedFrame=frame;
-    if(p>.01&&this.sequenceManifest&&!this.sequenceWarmStarted&&!this.reduced&&!this.film){
+    if(p>.01&&this.sequenceManifest&&!this.sequenceWarmStarted&&!this.reduced){
       this.sequenceWarmStarted=true;
       if(!navigator.connection?.saveData)this.warmSequence();
     }
@@ -163,7 +159,7 @@ class GoomSite {
     this.journeyFormula.classList.add('is-arrived');
     this.journeyFormula.inert=false;
     this.journeyFormula.setAttribute('aria-hidden','false');
-    const scene=this.reduced?1:this.frameVariant==='mobile-film-v4'?(frame<=24?1:frame>=76&&frame<=104?2:0):frame<=69?1:frame>=99&&frame<=168?2:frame>=180?3:0;
+    const scene=this.reduced?1:this.frameVariant==='mobile-film-v3'?(frame<=24?1:frame>=76&&frame<=104?2:0):frame<=69?1:frame>=99&&frame<=168?2:frame>=180?3:0;
     this.copyBlocks.forEach(el=>{
       const active=Number(el.dataset.scene)===scene;
       el.classList.toggle('is-on',active);el.inert=!active;el.setAttribute('aria-hidden',String(!active));
@@ -172,8 +168,8 @@ class GoomSite {
     this.cue.style.opacity=String(1-this.clamp(p/.06));
     this.hero.classList.toggle('is-opening',p<.08);
     const chapter=p<.40?0:p<.73?1:2;
-    if(this.frameVariant!=='mobile-film-v4')this.chapters.forEach((button,i)=>{if(i===chapter)button.setAttribute('aria-current','step');else button.removeAttribute('aria-current');});
-    if(this.frameVariant==='mobile-film-v4'){
+    if(this.frameVariant!=='mobile-film-v3')this.chapters.forEach((button,i)=>{if(i===chapter)button.setAttribute('aria-current','step');else button.removeAttribute('aria-current');});
+    if(this.frameVariant==='mobile-film-v3'){
       // The film's last frame is the formulas section itself; the live section fades in exactly on top of it.
       this.journeyFormula.classList.toggle('is-film-pending',p<.985);
       this.hero.classList.toggle('is-film-landed',p>=.985);
@@ -185,99 +181,8 @@ class GoomSite {
     this.hero.dataset.sourceFrame=String(frame);
   }
 
-  /* ---------- Phone film: fast path ----------
-     Every compressed frame (~54 KB) is fetched right away, in playback order, and kept as a Blob.
-     Decoding runs ahead of the scroll direction, cropped and resized to the canvas once, so each
-     paint is a 1:1 blit. Bitmap memory stays bounded; nothing waits for the user to scroll first. */
-  startFilm() {
-    const {w,h}=this.journeyLayout, cw=this.canvas.width, ch=this.canvas.height;
-    const base=`assets/sequence/${this.frameVariant}/`;
-    if(this.film&&this.film.base===base&&this.film.cw===cw&&this.film.ch===ch)return;
-    const blobs=this.film?.base===base?this.film.blobs:new Array(this.frameCount);
-    this.film?.bitmaps.forEach(b=>b.close());
-    const SW=720,SH=1560,scale=Math.max(cw/SW,ch/SH),sw=cw/scale,sh=ch/scale;
-    const f=this.film={base,cw,ch,blobs,bitmaps:new Map(),decoding:new Set(),dir:1,last:0,
-      crop:[(SW-sw)/2,(SH-sh)/2,sw,sh],keep:28,ahead:22,behind:8,drawn:-1};
-    if(f.fetching)return;
-    f.fetching=true;
-    const signal=this.mediaAbort.signal, n=this.frameCount;
-    // Load order: the first scroll in full, then a coarse-to-fine skeleton of the whole film,
-    // so any scroll position always has a near frame even on a slow connection.
-    const order=[],seen=new Set(),add=i=>{if(i>=0&&i<n&&!seen.has(i)){seen.add(i);order.push(i);}};
-    for(let i=0;i<=24;i++)add(i);
-    for(const step of [8,4,2,1])for(let i=0;i<n;i+=step)add(i);
-    add(n-1);
-    let cursor=0;
-    const pad=i=>String(i).padStart(3,'0');
-    const worker=async()=>{
-      while(cursor<order.length&&!this.destroyed&&this.film===f){
-        const i=order[cursor++];
-        if(f.blobs[i])continue;
-        for(let attempt=0;attempt<3;attempt++){
-          try{
-            const r=await fetch(`${base}f${pad(i)}.webp`,{signal,priority:cursor<42?'high':'low'});
-            if(!r.ok)throw new Error('frame '+i);
-            f.blobs[i]=await r.blob();break;
-          }catch(e){ if(e.name==='AbortError')return; await new Promise(res=>setTimeout(res,180*(attempt+1))); }
-        }
-        if(this.film===f&&i>=this.wantedFrame-f.behind&&i<=this.wantedFrame+f.ahead)this.filmQueue(this.wantedFrame??0);
-      }
-    };
-    const lanes=navigator.connection?.saveData?2:6;
-    for(let k=0;k<lanes;k++)worker();
-    this.filmQueue(this.wantedFrame??0);
-  }
-
-  stopFilm() {
-    if(!this.film)return;
-    this.film.bitmaps.forEach(b=>b.close());
-    this.film=null;
-  }
-
-  filmQueue(center) {
-    const f=this.film; if(!f)return;
-    const dir=center>f.last?1:center<f.last?-1:f.dir; f.dir=dir; f.last=center;
-    const n=this.frameCount, lo=dir>0?center-f.behind:center-f.ahead, hi=dir>0?center+f.ahead:center+f.behind;
-    // evict what the scroll has left behind
-    if(f.bitmaps.size>f.keep){
-      [...f.bitmaps.keys()].filter(i=>i<lo||i>hi).sort((a,b)=>Math.abs(b-center)-Math.abs(a-center))
-        .slice(0,f.bitmaps.size-f.keep).forEach(i=>{f.bitmaps.get(i).close();f.bitmaps.delete(i);});
-    }
-    const want=[center];
-    for(let d=1;d<=f.ahead;d++){want.push(center+dir*d);if(d<=f.behind)want.push(center-dir*d);}
-    for(const i of want){
-      if(f.decoding.size>=3)break;
-      if(i<0||i>=n||f.bitmaps.has(i)||f.decoding.has(i)||!f.blobs[i])continue;
-      if(f.bitmaps.size+f.decoding.size>=f.keep+4)break;
-      f.decoding.add(i);
-      const [sx,sy,sw,sh]=f.crop;
-      createImageBitmap(f.blobs[i],sx,sy,sw,sh,{resizeWidth:f.cw,resizeHeight:f.ch,resizeQuality:'high'})
-        .catch(()=>createImageBitmap(f.blobs[i],sx,sy,sw,sh))
-        .then(bm=>{
-          f.decoding.delete(i);
-          if(this.film!==f||this.destroyed){bm.close();return;}
-          f.bitmaps.set(i,bm);
-          if(Math.abs(i-this.wantedFrame)<Math.abs(f.drawn-this.wantedFrame)||f.drawn<0)this.filmDraw(this.wantedFrame);
-          this.filmQueue(this.wantedFrame);
-        },()=>{f.decoding.delete(i);});
-    }
-  }
-
-  filmDraw(want) {
-    const f=this.film; if(!f)return;
-    let i=f.bitmaps.has(want)?want:-1;
-    if(i<0){let best=1e9;f.bitmaps.forEach((_,k)=>{const d=Math.abs(k-want);if(d<best){best=d;i=k;}});}
-    if(i<0||i===f.drawn)return;
-    const bm=f.bitmaps.get(i);
-    this.ctx.setTransform(1,0,0,1,0,0);
-    this.ctx.drawImage(bm,0,0,f.cw,f.ch);
-    f.drawn=i;this.hero.dataset.renderedFrame=String(i);
-    this.hero.classList.add('sequence-ready');
-  }
-
   queueSequenceFrames(center) {
     if(this.reduced||this.destroyed)return;
-    if(this.film)return this.filmQueue(center);
     const variant=this.frameVariant;
     const frames=[center];
     const direction=center>=(this.previousWanted??0)?1:-1;
@@ -323,7 +228,6 @@ class GoomSite {
 
   drawSequenceFrame(want) {
     if(!this.ctx||this.reduced)return;
-    if(this.film)return this.filmDraw(want);
     const variant=this.frameVariant;
     let frame=this.frameCache.get(variant+':'+want);
     if(!frame)frame=[...this.frameCache.values()].filter(f=>f.variant===variant).sort((a,b)=>Math.abs(a.n-want)-Math.abs(b.n-want))[0];
@@ -383,7 +287,7 @@ class GoomSite {
       const id = anchor?.getAttribute('href');
       if (chapter) {
         event.preventDefault();
-        const beat=(this.frameVariant==='mobile-film-v4'?[0,.58,1]:[0,.50,.86])[Number(chapter.dataset.chapter)];
+        const beat=(this.frameVariant==='mobile-film-v3'?[0,.58,1]:[0,.50,.86])[Number(chapter.dataset.chapter)];
         const top=this.hero.getBoundingClientRect().top+scrollY+beat*this.journeyLayout.span;
         window.scrollTo({top,behavior:this.reduced?'instant':'smooth'});
       } else if(id==='#formulas') {
@@ -464,31 +368,6 @@ class GoomSite {
   }
 
   initAmbientMotion() {
-    // Background videos download only when they are about to be seen.
-    // Video covers are fetched only when their section is near, so the opening film gets the bandwidth.
-    const covered=[...document.querySelectorAll('video[data-poster]')];
-    if(covered.length){
-      const setPoster=v=>{if(v.dataset.poster){v.poster=v.dataset.poster;delete v.dataset.poster;}};
-      if('IntersectionObserver' in window){
-        const sections=[...new Set(covered.map(v=>v.closest('section')||v))];
-        this.posterObserver=new IntersectionObserver(entries=>entries.forEach(entry=>{
-          if(!entry.isIntersecting)return;
-          entry.target.querySelectorAll?.('video[data-poster]').forEach(setPoster);
-          if(entry.target.matches?.('video[data-poster]'))setPoster(entry.target);
-          this.posterObserver.unobserve(entry.target);
-        }),{rootMargin:'900px 0px'});
-        sections.forEach(el=>this.posterObserver.observe(el));
-      }else covered.forEach(setPoster);
-    }
-    const lazyVideos=[...document.querySelectorAll('video[data-autoplay]')];
-    if(lazyVideos.length&&'IntersectionObserver' in window){
-      this.videoObserver=new IntersectionObserver(entries=>entries.forEach(entry=>{
-        const v=entry.target;
-        if(entry.isIntersecting){if(v.preload!=='auto')v.preload='auto';if(!this.reduced)v.play?.().catch(()=>{});}
-        else v.pause?.();
-      }),{rootMargin:'300px 0px'});
-      lazyVideos.forEach(v=>this.videoObserver.observe(v));
-    }
     if(this.reduced)return;
     this.motionObserver=new IntersectionObserver(entries=>entries.forEach(entry=>entry.target.classList.toggle('motion-visible',entry.isIntersecting)),{threshold:.05});
     document.querySelectorAll('.ritual,.bundles,.final-cta,.gh-brand').forEach(el=>this.motionObserver.observe(el));
@@ -507,23 +386,23 @@ class GoomSite {
     if (!rail || !caption || !nodes || !fill) return;
 
     this.formulas = [
-      { id:'b12', ink:'#8a5a00', img:'assets/p-b12.webp', accent:'#e0a012', label:'B12+D3+B9', name:'B12+D3+B9',
+      { id:'b12', ink:'#8a5a00', img:'assets/p-b12.png', accent:'#e0a012', label:'B12+D3+B9', name:'B12+D3+B9',
         kicker:'5-IN-1 · PASSION FRUIT',
         line:'האנרגיה של היום־יום, בלי הצניחה של אחרי הצהריים.',
         bullets:['B12, D3, B9, אבץ וברזל','60 גומיות בטעם פסיפלורה','גומי אחד ביום, בלי כוס מים'] },
-      { id:'grow', ink:'#175a86', img:'assets/p-grow.webp', accent:'#2f9fe0', label:'Grow', name:'Grow',
+      { id:'grow', ink:'#175a86', img:'assets/p-grow.png', accent:'#2f9fe0', label:'Grow', name:'Grow',
         kicker:'MEN · BERRY',
         line:'ביוטין, אבץ ו־B12 לשיער, לעור ולציפורניים.',
         bullets:['ביוטין + אבץ + B12','60 גומיות בטעם פירות יער','מותאם לשגרה של גברים'] },
-      { id:'flow', ink:'#a33512', img:'assets/flow-clean.webp', accent:'#f45f2b', label:'Flow', name:'Flow',
+      { id:'flow', ink:'#a33512', img:'assets/flow-clean.png', accent:'#f45f2b', label:'Flow', name:'Flow',
         kicker:'2-IN-1 · TUTTI FRUTTI',
         line:'פרוביוטיקה וסיבים פרהביוטיים לעיכול מאוזן ולתחושת קלילות.',
         bullets:['פרוביוטיקה + סיבים פרהביוטיים','60 גומיות בטעם טוטי פרוטי','הפורמולה הנמכרת ביותר שלנו'] },
-      { id:'shine', ink:'#8d1a14', img:'assets/p-shine.webp', accent:'#e0342c', label:'Shine', name:'Shine',
+      { id:'shine', ink:'#8d1a14', img:'assets/p-shine.png', accent:'#e0342c', label:'Shine', name:'Shine',
         kicker:'3-IN-1 · MIXED BERRIES',
         line:'קולגן וחומצה היאלורונית לזוהר שרואים מבפנים החוצה.',
         bullets:['קולגן + חומצה היאלורונית','40 גומיות בטעם פירות יער','משלים יפה את Flow'] },
-      { id:'sleep', ink:'#392c96', img:'assets/p-sleep.webp', accent:'#5b4bd6', label:'Deep Sleep', name:'Deep Sleep',
+      { id:'sleep', ink:'#392c96', img:'assets/p-sleep.png', accent:'#5b4bd6', label:'Deep Sleep', name:'Deep Sleep',
         kicker:'5-IN-1 · LAVENDER',
         line:'מלטונין, מגנזיום ו־L־תיאנין ללילה שקט ולבוקר צלול.',
         bullets:['מלטונין + L־תיאנין + מגנזיום','60 גומיות בטעם לבנדר','לקחת כחצי שעה לפני השינה'] }

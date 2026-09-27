@@ -234,7 +234,7 @@
 /* Mobile portrait film — full-screen frames built from the supplied mobile plates.
    Hero copy lives over frame 0 only; the web "all the good" ring copy and chapter rail are not part of the phone film. */
 @media (max-width:900px) and (orientation:portrait) and (prefers-reduced-motion:no-preference) {
-  .hero.is-mobile-film { height:330svh; }
+  .hero.is-mobile-film { height:400svh; }
   /* Splash: headline over the open top of the plate, copy + CTA over the soft foreground, bottle free in between */
   .hero.is-mobile-film .hero-copy[data-scene="2"] { top:10.5svh; bottom:calc(76px + env(safe-area-inset-bottom)); left:6%; right:6%; display:flex; flex-direction:column; align-items:flex-start; text-align:right; }
   .hero.is-mobile-film .hero-copy[data-scene="2"]::before { content:''; position:fixed; inset:0; z-index:-1; pointer-events:none;
@@ -252,8 +252,10 @@
 
 /* ───────── Phone film v3: hero → raised → oranges → formulas ───────── */
 @media (max-width:900px) and (orientation:portrait) and (prefers-reduced-motion:no-preference) {
-  html.has-mobile-film { scroll-padding-top:0; }
+  /* magnetic stops: each scroll settles on a composed frame */
+  html.has-mobile-film { scroll-snap-type:y proximity; scroll-padding-top:0; }
   .hero.is-mobile-film { position:relative; }
+  .hero.is-mobile-film .film-stop { display:block; position:absolute; left:0; width:1px; height:1px; top:calc(var(--p) * 300svh); scroll-snap-align:start; scroll-snap-stop:normal; pointer-events:none; }
 
   /* the film's last frame is this section; it appears exactly on top of it */
   .hero.is-mobile-film + #formulas { position:relative; z-index:2; margin-top:-100svh; transition:opacity 320ms cubic-bezier(.22,1,.36,1),visibility 0s; }
@@ -272,62 +274,32 @@
   html.has-mobile-film .journey-chapters [aria-current] { background:rgba(255,255,255,.55); box-shadow:inset 0 1px 0 rgba(255,255,255,.95),0 2px 8px rgba(58,34,120,.12); }
 }
 
-/* ───────── One button system on phones — liquid glass, always round ─────────
-   Shape: full pill (text) or full circle (icon). One height, one type style, one light source (top).
-   Deep violet glass = the main action or the selected option. Light glass = everything secondary. */
+/* ───────── Liquid glass — every button on phones ─────────
+   Light glass for controls, deep-violet glass for primary actions. One light source: top. */
 @media (max-width:900px) {
   :root {
-    --btn-h:48px; --btn-h-sm:42px;
-    --glass-light: linear-gradient(180deg,rgba(255,255,255,.66) 0%,rgba(255,255,255,.3) 50%,rgba(238,229,255,.4) 100%);
-    --glass-light-edge: inset 0 1px 0 rgba(255,255,255,.95), inset 0 -1px 0 rgba(122,92,206,.2), inset 0 0 0 1px rgba(255,255,255,.45), 0 10px 26px -12px rgba(52,28,118,.35), 0 2px 6px rgba(52,28,118,.08);
-    --glass-deep: linear-gradient(180deg,rgba(108,78,200,.9) 0%,rgba(62,36,146,.92) 52%,rgba(42,22,106,.95) 100%);
-    --glass-deep-edge: inset 0 1px 0 rgba(255,255,255,.5), inset 0 -2px 6px rgba(20,8,60,.32), inset 0 0 0 1px rgba(255,255,255,.16), 0 14px 30px -12px rgba(40,18,110,.6), 0 3px 8px rgba(40,18,110,.16);
+    --lg-light: linear-gradient(180deg,rgba(255,255,255,.62) 0%,rgba(255,255,255,.26) 48%,rgba(236,226,255,.34) 100%);
+    --lg-light-edge: inset 0 1px 0 rgba(255,255,255,.95), inset 0 -1px 0 rgba(122,92,206,.22), inset 0 0 0 1px rgba(255,255,255,.42), 0 10px 28px -10px rgba(52,28,118,.32), 0 2px 6px rgba(52,28,118,.08);
+    --lg-dark: linear-gradient(180deg,rgba(104,74,196,.88) 0%,rgba(58,34,142,.9) 52%,rgba(40,22,104,.94) 100%);
+    --lg-dark-edge: inset 0 1px 0 rgba(255,255,255,.5), inset 0 -2px 6px rgba(20,8,60,.35), inset 0 0 0 1px rgba(255,255,255,.16), 0 14px 30px -12px rgba(40,18,110,.6), 0 3px 8px rgba(40,18,110,.18);
   }
-  /* every text button: identical pill */
-  :is(.hero-copy .hero-btn, .formula-caption .f-cta, .final-button, .bundle-info a, .bundles-all, .ritual-link, .faq-head a, .stories-pause, .ritual [data-ritual]) {
-    display:inline-flex!important; align-items:center; justify-content:center; gap:10px;
-    min-height:var(--btn-h)!important; padding:0 24px!important; border-radius:999px!important; border:0!important;
-    font-size:14px!important; font-weight:600!important; line-height:1!important; letter-spacing:.005em; text-decoration:none!important; white-space:nowrap;
+  .journey-chapters,
+  .formula-arrow, .stories-arrow, .stories-pause, .bundle-pagination button,
+  .ritual [data-ritual], .final-button.alt, .bundles-all, .ritual-link {
+    background:var(--lg-light)!important; box-shadow:var(--lg-light-edge)!important; border:0!important;
     -webkit-backdrop-filter:blur(16px) saturate(170%); backdrop-filter:blur(16px) saturate(170%);
-    transition:transform 160ms cubic-bezier(.22,1,.36,1),box-shadow 200ms ease,background 200ms ease,color 200ms ease;
+    color:#2b1767!important;
   }
-  /* every icon button: identical circle */
-  :is(.formula-arrow, .stories-arrow, .bundle-pagination button) {
-    display:inline-grid!important; place-items:center; padding:0!important; border:0!important; border-radius:50%!important;
-    width:52px!important; height:52px!important; min-width:52px; min-height:52px; font-size:20px; font-weight:600;
-    -webkit-backdrop-filter:blur(16px) saturate(170%); backdrop-filter:blur(16px) saturate(170%);
-    transition:transform 160ms cubic-bezier(.22,1,.36,1),box-shadow 200ms ease,background 200ms ease,color 200ms ease;
+  .hero-copy .hero-btn, .hero-copy .hero-btn.liquid-glass, .formula-caption .f-cta, .final-button:not(.alt), .bundle-info a {
+    background:var(--lg-dark)!important; box-shadow:var(--lg-dark-edge)!important; border:0!important; color:#fff!important;
+    -webkit-backdrop-filter:blur(14px) saturate(160%); backdrop-filter:blur(14px) saturate(160%);
+    border-radius:999px; min-height:48px; padding-inline:22px; display:inline-flex; align-items:center; gap:12px; font-weight:600; letter-spacing:.005em;
+    transition:transform 160ms cubic-bezier(.22,1,.36,1),box-shadow 200ms ease;
   }
-  .bundle-pagination button { width:44px!important; height:44px!important; min-width:44px; min-height:44px; font-size:13px; }
-  .ritual [data-ritual] { min-height:var(--btn-h-sm)!important; padding:0 16px!important; font-size:13px!important; }
-
-  /* secondary + unselected: light glass */
-  :is(.bundles-all, .ritual-link, .faq-head a, .final-button.alt, .stories-pause, .formula-arrow, .stories-arrow,
-      .ritual [data-ritual][aria-pressed="false"], .bundle-pagination button:not([aria-current])) {
-    background:var(--glass-light)!important; box-shadow:var(--glass-light-edge)!important; color:#2b1767!important;
-  }
-  /* main action + selected: deep violet glass */
-  :is(.hero-copy .hero-btn, .hero-copy .hero-btn.liquid-glass, .formula-caption .f-cta, .final-button:not(.alt), .bundle-info a,
-      .ritual [data-ritual][aria-pressed="true"], .bundle-pagination button[aria-current]) {
-    background:var(--glass-deep)!important; box-shadow:var(--glass-deep-edge)!important; color:#fff!important;
-  }
-  .bundles-all, .ritual-link, .faq-head a { margin-top:18px; }
-  .ritual-link span, .bundles-all span { font-size:16px; }
-
-  /* the chapter rail is a glass container, not a button */
-  .journey-chapters { background:var(--glass-light)!important; box-shadow:var(--glass-light-edge)!important; border:0!important;
-    -webkit-backdrop-filter:blur(16px) saturate(170%); backdrop-filter:blur(16px) saturate(170%); }
-
-  :is(.hero-copy .hero-btn,.formula-caption .f-cta,.final-button,.bundle-info a,.bundles-all,.ritual-link,.faq-head a,.stories-pause,.ritual [data-ritual],.formula-arrow,.stories-arrow,.bundle-pagination button):active { transform:scale(.96); }
-  :is(.hero-copy .hero-btn,.formula-caption .f-cta,.final-button,.bundle-info a,.bundles-all,.ritual-link,.faq-head a,.stories-pause,.ritual [data-ritual],.formula-arrow,.stories-arrow,.bundle-pagination button,.journey-chapters button):focus-visible { outline:2px solid #fff; outline-offset:3px; box-shadow:0 0 0 5px rgba(62,36,146,.55)!important; }
+  .formula-arrow, .stories-arrow { border-radius:50%; min-width:52px; min-height:52px; display:grid; place-items:center; font-size:22px; transition:transform 160ms cubic-bezier(.22,1,.36,1); }
+  :is(.hero-copy .hero-btn,.formula-caption .f-cta,.final-button,.bundle-info a,.formula-arrow,.stories-arrow,.bundles-all,.ritual-link,.bundle-pagination button,.ritual [data-ritual]):active { transform:scale(.96); }
+  :is(.hero-copy .hero-btn,.formula-caption .f-cta,.final-button,.formula-arrow,.stories-arrow,.journey-chapters button):focus-visible { outline:2px solid #fff; outline-offset:3px; }
 }
 @media (max-width:900px) and (prefers-reduced-motion:reduce) {
-  :is(.hero-copy .hero-btn,.formula-caption .f-cta,.final-button,.formula-arrow,.stories-arrow,.bundle-pagination button,.ritual [data-ritual]):active { transform:none; }
-}
-
-@media (max-width:900px) and (orientation:portrait) { .hero.is-mobile-film .source-canvas { will-change:contents; transform:translateZ(0); } }
-@media (max-width:900px) {
-  .ritual-options { display:flex!important; flex-wrap:wrap; justify-content:center; gap:8px!important; border:0!important; background:none!important; }
-  .ritual-options [data-ritual] { flex:0 1 auto; padding:0 14px!important; }
-  .bundle-pagination { gap:10px!important; }
+  :is(.hero-copy .hero-btn,.formula-caption .f-cta,.final-button,.formula-arrow,.stories-arrow):active { transform:none; }
 }

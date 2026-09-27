@@ -9,11 +9,11 @@
   <link rel="icon" href="assets/logo.png" type="image/png">
   <link rel="preload" href="assets/fonts/discovery-medium.woff" as="font" type="font/woff" crossorigin>
   <link rel="preload" href="assets/sequence/portrait/f000.webp" as="image" media="not all and (max-width:900px) and (orientation:portrait)">
-  <link rel="preload" href="assets/sequence/mobile-film-v4/f000.webp" as="image" media="(max-width:900px) and (orientation:portrait)">
-  <link rel="stylesheet" href="site.css?v=20260928-fast2">
-  <link rel="stylesheet" href="cinematic.css?v=20260928-fast2">
-  <link rel="stylesheet" href="mobile-first.css?v=20260928-fast2">
-  <script src="app.js?v=20260928-fast2" defer></script>
+  <link rel="preload" href="assets/sequence/mobile-film-v3/f000.webp" as="image" media="(max-width:900px) and (orientation:portrait)">
+  <link rel="stylesheet" href="site.css?v=20260927-mfilm7">
+  <link rel="stylesheet" href="cinematic.css?v=20260927-mfilm7">
+  <link rel="stylesheet" href="mobile-first.css?v=20260927-mfilm7">
+  <script src="app.js?v=20260927-mfilm7" defer></script>
 </head>
 <body>
 <div class="goom-page" dir="rtl">
@@ -50,7 +50,7 @@
       <i class="film-stop" style="--p:0" aria-hidden="true"></i><i class="film-stop" style="--p:.185" aria-hidden="true"></i><i class="film-stop" style="--p:.58" aria-hidden="true"></i><i class="film-stop" style="--p:1" aria-hidden="true"></i>
       <div class="hero-pin">
         <div class="source-sequence" aria-hidden="true">
-          <picture><source media="(max-width:900px) and (orientation:portrait)" srcset="assets/sequence/mobile-film-v4/f000.webp"><img class="source-poster" src="assets/sequence/portrait/f000.webp" alt="" fetchpriority="high"></picture>
+          <picture><source media="(max-width:900px) and (orientation:portrait)" srcset="assets/sequence/mobile-film-v3/f000.webp"><img class="source-poster" src="assets/sequence/portrait/f000.webp" alt="" fetchpriority="high"></picture>
           <canvas class="source-canvas" data-source-canvas width="1920" height="1080"></canvas>
         </div>
         <div class="hero-copy is-on" data-scene="1">
@@ -89,7 +89,7 @@
     <section class="formula product-section" id="formulas" data-formula tabindex="-1" aria-labelledby="formula-title">
       <div class="formula-pin">
         <div class="formula-blob" aria-hidden="true">
-          <img class="formula-plate" src="assets/bg-b.webp" alt="" decoding="async" fetchpriority="low">
+          <img class="formula-plate" src="assets/bg-b.jpg" alt="" decoding="async">
         </div>
 
         <div class="formula-stage">
@@ -134,9 +134,9 @@
         <div class="ritual-orbit orbit-two" aria-hidden="true"></div>
         <span class="ritual-word" aria-hidden="true" dir="ltr">GOOD<br>EVERY DAY.</span>
         <div class="ritual-products">
-          <img src="assets/p-b12.webp" alt="B12+D3+B9" loading="lazy" decoding="async" data-ritual-product="0">
-          <img src="assets/flow-clean.webp" alt="Flow" loading="lazy" decoding="async" data-ritual-product="1">
-          <img src="assets/p-sleep.webp" alt="Deep Sleep" loading="lazy" decoding="async" data-ritual-product="2">
+          <img src="assets/p-b12.png" alt="B12+D3+B9" loading="lazy" decoding="async" data-ritual-product="0">
+          <img src="assets/flow-clean.png" alt="Flow" loading="lazy" decoding="async" data-ritual-product="1">
+          <img src="assets/p-sleep.png" alt="Deep Sleep" loading="lazy" decoding="async" data-ritual-product="2">
         </div>
         <span class="ritual-caption" dir="ltr">YOUR DAILY DOSE OF GOOD</span>
       </div>
@@ -151,18 +151,18 @@
       <div data-stage3d>
         <div class="stories-scene" dir="ltr" data-stories-scene>
           <div class="stories-ring" data-ring3d style="--n:12">
-          <button class="stories-card" data-slot style="--i:0"><video src="assets/adar-story.mp4" data-poster="assets/stories/noa-poster-sm.jpg" preload="none" muted loop playsinline></video><span class="story-play"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>נועה · הבוקר שלי סוף סוף רגוע</span></button>
-          <button class="stories-card" data-slot style="--i:1"><video src="assets/brand-story.mp4" data-poster="assets/stories/adar-poster-sm.jpg" preload="none" muted loop playsinline></video><span class="story-play"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>אדר · לקח לי שבועיים להרגיש את זה</span></button>
-          <button class="stories-card" data-slot style="--i:2"><video src="assets/guy-story.mp4" data-poster="assets/stories/shir-poster-sm.jpg" preload="none" muted loop playsinline></video><span class="story-play"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>שיר · טעים מדי בשביל ויטמין</span></button>
-          <button class="stories-card" data-slot style="--i:3"><video src="assets/guy-story.mp4" data-poster="assets/stories/guy-poster-sm.jpg" preload="none" muted loop playsinline></video><span class="story-play"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>גיא · נכנס לשגרה בלי מאמץ</span></button>
-          <button class="stories-card" data-slot style="--i:4"><video src="assets/brand-story.mp4" data-poster="assets/stories/elia-poster-sm.jpg" preload="none" muted loop playsinline></video><span class="story-play"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>אליה · העור שלי אמר תודה</span></button>
-          <button class="stories-card" data-slot style="--i:5"><video src="assets/adar-story.mp4" data-poster="assets/stories/doctor-poster-sm.jpg" preload="none" muted loop playsinline></video><span class="story-play"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>ד"ר רון · ההרכב פה באמת מדויק</span></button>
-          <button class="stories-card" data-slot style="--i:6"><video src="assets/adar-story.mp4" data-poster="assets/stories/noa-poster-sm.jpg" preload="none" muted loop playsinline></video><span class="story-play"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>נועה · הבוקר שלי סוף סוף רגוע</span></button>
-          <button class="stories-card" data-slot style="--i:7"><video src="assets/brand-story.mp4" data-poster="assets/stories/adar-poster-sm.jpg" preload="none" muted loop playsinline></video><span class="story-play"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>אדר · לקח לי שבועיים להרגיש את זה</span></button>
-          <button class="stories-card" data-slot style="--i:8"><video src="assets/guy-story.mp4" data-poster="assets/stories/shir-poster-sm.jpg" preload="none" muted loop playsinline></video><span class="story-play"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>שיר · טעים מדי בשביל ויטמין</span></button>
-          <button class="stories-card" data-slot style="--i:9"><video src="assets/guy-story.mp4" data-poster="assets/stories/guy-poster-sm.jpg" preload="none" muted loop playsinline></video><span class="story-play"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>גיא · נכנס לשגרה בלי מאמץ</span></button>
-          <button class="stories-card" data-slot style="--i:10"><video src="assets/brand-story.mp4" data-poster="assets/stories/elia-poster-sm.jpg" preload="none" muted loop playsinline></video><span class="story-play"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>אליה · העור שלי אמר תודה</span></button>
-          <button class="stories-card" data-slot style="--i:11"><video src="assets/adar-story.mp4" data-poster="assets/stories/doctor-poster-sm.jpg" preload="none" muted loop playsinline></video><span class="story-play"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>ד"ר רון · ההרכב פה באמת מדויק</span></button>
+          <button class="stories-card" data-slot style="--i:0"><video src="assets/adar-story.mp4" poster="assets/stories/noa-poster-sm.jpg" preload="none" muted loop playsinline></video><span class="story-play"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>נועה · הבוקר שלי סוף סוף רגוע</span></button>
+          <button class="stories-card" data-slot style="--i:1"><video src="assets/brand-story.mp4" poster="assets/stories/adar-poster-sm.jpg" preload="none" muted loop playsinline></video><span class="story-play"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>אדר · לקח לי שבועיים להרגיש את זה</span></button>
+          <button class="stories-card" data-slot style="--i:2"><video src="assets/guy-story.mp4" poster="assets/stories/shir-poster-sm.jpg" preload="none" muted loop playsinline></video><span class="story-play"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>שיר · טעים מדי בשביל ויטמין</span></button>
+          <button class="stories-card" data-slot style="--i:3"><video src="assets/guy-story.mp4" poster="assets/stories/guy-poster-sm.jpg" preload="none" muted loop playsinline></video><span class="story-play"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>גיא · נכנס לשגרה בלי מאמץ</span></button>
+          <button class="stories-card" data-slot style="--i:4"><video src="assets/brand-story.mp4" poster="assets/stories/elia-poster-sm.jpg" preload="none" muted loop playsinline></video><span class="story-play"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>אליה · העור שלי אמר תודה</span></button>
+          <button class="stories-card" data-slot style="--i:5"><video src="assets/adar-story.mp4" poster="assets/stories/doctor-poster-sm.jpg" preload="none" muted loop playsinline></video><span class="story-play"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>ד"ר רון · ההרכב פה באמת מדויק</span></button>
+          <button class="stories-card" data-slot style="--i:6"><video src="assets/adar-story.mp4" poster="assets/stories/noa-poster-sm.jpg" preload="none" muted loop playsinline></video><span class="story-play"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>נועה · הבוקר שלי סוף סוף רגוע</span></button>
+          <button class="stories-card" data-slot style="--i:7"><video src="assets/brand-story.mp4" poster="assets/stories/adar-poster-sm.jpg" preload="none" muted loop playsinline></video><span class="story-play"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>אדר · לקח לי שבועיים להרגיש את זה</span></button>
+          <button class="stories-card" data-slot style="--i:8"><video src="assets/guy-story.mp4" poster="assets/stories/shir-poster-sm.jpg" preload="none" muted loop playsinline></video><span class="story-play"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>שיר · טעים מדי בשביל ויטמין</span></button>
+          <button class="stories-card" data-slot style="--i:9"><video src="assets/guy-story.mp4" poster="assets/stories/guy-poster-sm.jpg" preload="none" muted loop playsinline></video><span class="story-play"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>גיא · נכנס לשגרה בלי מאמץ</span></button>
+          <button class="stories-card" data-slot style="--i:10"><video src="assets/brand-story.mp4" poster="assets/stories/elia-poster-sm.jpg" preload="none" muted loop playsinline></video><span class="story-play"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>אליה · העור שלי אמר תודה</span></button>
+          <button class="stories-card" data-slot style="--i:11"><video src="assets/adar-story.mp4" poster="assets/stories/doctor-poster-sm.jpg" preload="none" muted loop playsinline></video><span class="story-play"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>ד"ר רון · ההרכב פה באמת מדויק</span></button>
           </div>
         </div>
         <div class="stories-controls">
@@ -182,7 +182,7 @@
         </header>
         <div class="gh-brand-grid">
           <figure class="gh-brand-photo" data-reveal>
-            <video src="assets/brand-story.mp4" data-poster="assets/quality-lifestyle.jpg" muted loop playsinline preload="none" data-autoplay aria-label="רגעים מהעולם של GOOM"></video>
+            <video src="assets/brand-story.mp4" poster="assets/quality-lifestyle.jpg" muted loop autoplay playsinline preload="metadata" aria-label="רגעים מהעולם של GOOM"></video>
             <img src="assets/quality-lifestyle.jpg" alt="רגע קטן בשגרת GOOM" loading="lazy">
             <figcaption>החלטה קטנה. מקום גדול לעצמכם.</figcaption>
           </figure>
@@ -202,16 +202,16 @@
     <section id="press" class="press-section">
       <p data-reveal>בטח ראיתם אותנו גם ב</p>
       <div class="press-mask"><div class="press-track">
-        <span class="press-logo"><img src="assets/press/press-reshet.png" alt="רשת 13" loading="lazy" decoding="async"></span><span class="press-logo"><img src="assets/press/press-7.png" alt="ערוץ 7" loading="lazy" decoding="async"></span><span class="press-logo"><img src="assets/press/press-maariv.png" alt="מעריב" loading="lazy" decoding="async"></span><span class="press-logo"><img src="assets/press/press-terminalx.png" alt="Terminal X" loading="lazy" decoding="async"></span><span class="press-logo"><img src="assets/press/press-5.webp" alt="BIO גאיה" loading="lazy" decoding="async"></span><span class="press-logo"><img src="assets/press/press-israelhayom.png" alt="ישראל היום" loading="lazy" decoding="async"></span><span class="press-logo"><img src="assets/press/press-14.svg" alt="ערוץ 14" loading="lazy" decoding="async"></span><span class="press-logo"><img src="assets/press/press-hitechzone.webp" alt="Hitech Zone" loading="lazy" decoding="async"></span>
-        <span class="press-logo"><img src="assets/press/press-reshet.png" alt="" loading="lazy" decoding="async"></span><span class="press-logo"><img src="assets/press/press-7.png" alt="" loading="lazy" decoding="async"></span><span class="press-logo"><img src="assets/press/press-maariv.png" alt="" loading="lazy" decoding="async"></span><span class="press-logo"><img src="assets/press/press-terminalx.png" alt="" loading="lazy" decoding="async"></span><span class="press-logo"><img src="assets/press/press-5.webp" alt="" loading="lazy" decoding="async"></span><span class="press-logo"><img src="assets/press/press-israelhayom.png" alt="" loading="lazy" decoding="async"></span><span class="press-logo"><img src="assets/press/press-14.svg" alt="" loading="lazy" decoding="async"></span><span class="press-logo"><img src="assets/press/press-hitechzone.webp" alt="" loading="lazy" decoding="async"></span>
+        <span class="press-logo"><img src="assets/press/press-reshet.png" alt="רשת 13"></span><span class="press-logo"><img src="assets/press/press-7.png" alt="ערוץ 7"></span><span class="press-logo"><img src="assets/press/press-maariv.png" alt="מעריב"></span><span class="press-logo"><img src="assets/press/press-terminalx.png" alt="Terminal X"></span><span class="press-logo"><img src="assets/press/press-5.webp" alt="BIO גאיה"></span><span class="press-logo"><img src="assets/press/press-israelhayom.png" alt="ישראל היום"></span><span class="press-logo"><img src="assets/press/press-14.svg" alt="ערוץ 14"></span><span class="press-logo"><img src="assets/press/press-hitechzone.webp" alt="Hitech Zone"></span>
+        <span class="press-logo"><img src="assets/press/press-reshet.png" alt=""></span><span class="press-logo"><img src="assets/press/press-7.png" alt=""></span><span class="press-logo"><img src="assets/press/press-maariv.png" alt=""></span><span class="press-logo"><img src="assets/press/press-terminalx.png" alt=""></span><span class="press-logo"><img src="assets/press/press-5.webp" alt=""></span><span class="press-logo"><img src="assets/press/press-israelhayom.png" alt=""></span><span class="press-logo"><img src="assets/press/press-14.svg" alt=""></span><span class="press-logo"><img src="assets/press/press-hitechzone.webp" alt=""></span>
       </div></div>
     </section>
 
     <section id="community" class="community-section">
       <div class="community-head" data-reveal><h2>טעימה קטנה<br>מהקהילה שלנו</h2><p>אלפי אנשים כבר הכניסו את GOOM לשגרה שלהם. אלה הרגעים שהם משתפים איתנו.</p></div>
       <div class="community-rows">
-        <div class="community-track"><img src="assets/social/social-17-sm.jpg" alt="" loading="lazy" decoding="async"><img src="assets/social/social-18-sm.jpg" alt="" loading="lazy" decoding="async"><img src="assets/social/social-20-sm.jpg" alt="" loading="lazy" decoding="async"><img src="assets/social/social-22-sm.jpg" alt="" loading="lazy" decoding="async"><img src="assets/social/quality-lifestyle-sm.jpg" alt="" loading="lazy" decoding="async"><img src="assets/social/community-current-sm.jpg" alt="" loading="lazy" decoding="async"><img src="assets/social/wellness-hero.png" alt="" loading="lazy" decoding="async"><img src="assets/social/social-17-sm.jpg" alt="" loading="lazy" decoding="async"><img src="assets/social/social-18-sm.jpg" alt="" loading="lazy" decoding="async"><img src="assets/social/social-20-sm.jpg" alt="" loading="lazy" decoding="async"><img src="assets/social/social-22-sm.jpg" alt="" loading="lazy" decoding="async"><img src="assets/social/quality-lifestyle-sm.jpg" alt="" loading="lazy" decoding="async"><img src="assets/social/community-current-sm.jpg" alt="" loading="lazy" decoding="async"><img src="assets/social/wellness-hero.png" alt="" loading="lazy" decoding="async"></div>
-        <div class="community-track"><img src="assets/stories/noa-poster-sm.jpg" alt="" loading="lazy" decoding="async"><img src="assets/stories/adar-poster-sm.jpg" alt="" loading="lazy" decoding="async"><img src="assets/stories/shir-poster-sm.jpg" alt="" loading="lazy" decoding="async"><img src="assets/stories/guy-poster-sm.jpg" alt="" loading="lazy" decoding="async"><img src="assets/stories/elia-poster-sm.jpg" alt="" loading="lazy" decoding="async"><img src="assets/stories/doctor-poster-sm.jpg" alt="" loading="lazy" decoding="async"><img src="assets/stories/noa-poster-sm.jpg" alt="" loading="lazy" decoding="async"><img src="assets/stories/adar-poster-sm.jpg" alt="" loading="lazy" decoding="async"><img src="assets/stories/shir-poster-sm.jpg" alt="" loading="lazy" decoding="async"><img src="assets/stories/guy-poster-sm.jpg" alt="" loading="lazy" decoding="async"><img src="assets/stories/elia-poster-sm.jpg" alt="" loading="lazy" decoding="async"><img src="assets/stories/doctor-poster-sm.jpg" alt="" loading="lazy" decoding="async"></div>
+        <div class="community-track"><img src="assets/social/social-17-sm.jpg" alt=""><img src="assets/social/social-18-sm.jpg" alt=""><img src="assets/social/social-20-sm.jpg" alt=""><img src="assets/social/social-22-sm.jpg" alt=""><img src="assets/social/quality-lifestyle-sm.jpg" alt=""><img src="assets/social/community-current-sm.jpg" alt=""><img src="assets/social/wellness-hero.png" alt=""><img src="assets/social/social-17-sm.jpg" alt=""><img src="assets/social/social-18-sm.jpg" alt=""><img src="assets/social/social-20-sm.jpg" alt=""><img src="assets/social/social-22-sm.jpg" alt=""><img src="assets/social/quality-lifestyle-sm.jpg" alt=""><img src="assets/social/community-current-sm.jpg" alt=""><img src="assets/social/wellness-hero.png" alt=""></div>
+        <div class="community-track"><img src="assets/stories/noa-poster-sm.jpg" alt=""><img src="assets/stories/adar-poster-sm.jpg" alt=""><img src="assets/stories/shir-poster-sm.jpg" alt=""><img src="assets/stories/guy-poster-sm.jpg" alt=""><img src="assets/stories/elia-poster-sm.jpg" alt=""><img src="assets/stories/doctor-poster-sm.jpg" alt=""><img src="assets/stories/noa-poster-sm.jpg" alt=""><img src="assets/stories/adar-poster-sm.jpg" alt=""><img src="assets/stories/shir-poster-sm.jpg" alt=""><img src="assets/stories/guy-poster-sm.jpg" alt=""><img src="assets/stories/elia-poster-sm.jpg" alt=""><img src="assets/stories/doctor-poster-sm.jpg" alt=""></div>
       </div>
     </section>
 
@@ -221,15 +221,15 @@
       <div class="bundles-heading" data-reveal><span class="f-eyebrow" dir="ltr">BETTER TOGETHER</span><h2 id="bundles-title">יותר טוב.<br><em>ביחד.</em></h2><p>יש דברים שפשוט משלימים זה את זה.<br>גלו את המארז שמתאים לרגעים שלכם.</p></div>
       <div class="bundle-track">
         <article class="bundle-card bundle-night" data-reveal>
-          <a href="https://goom.co.il/products/shine-sleep" aria-label="גלו את מארז Sleeping Beauty"><div class="bundle-art"><span class="bundle-halo"></span><span class="bundle-plinth"></span><img src="assets/p-shine.webp" alt="Shine" loading="lazy" decoding="async"><img src="assets/p-sleep.webp" alt="Deep Sleep" loading="lazy" decoding="async"></div></a>
+          <a href="https://goom.co.il/products/shine-sleep" aria-label="גלו את מארז Sleeping Beauty"><div class="bundle-art"><span class="bundle-halo"></span><span class="bundle-plinth"></span><img src="assets/p-shine.png" alt="Shine"><img src="assets/p-sleep.png" alt="Deep Sleep"></div></a>
           <div class="bundle-info"><span dir="ltr">SHINE + DEEP SLEEP</span><h3>Sleeping Beauty</h3><p>שני רגעים לשגרת הטיפוח שלכם.</p><a href="https://goom.co.il/products/shine-sleep">לגלות את המארז <b aria-hidden="true">↗</b></a></div>
         </article>
         <article class="bundle-card bundle-day" data-reveal>
-          <a href="https://goom.co.il/products/באנדל" aria-label="גלו את מארז Day & Night"><div class="bundle-art"><span class="bundle-halo"></span><span class="bundle-plinth"></span><img src="assets/flow-clean.webp" alt="Flow" loading="lazy" decoding="async"><img src="assets/p-sleep.webp" alt="Deep Sleep" loading="lazy" decoding="async"></div></a>
+          <a href="https://goom.co.il/products/באנדל" aria-label="גלו את מארז Day & Night"><div class="bundle-art"><span class="bundle-halo"></span><span class="bundle-plinth"></span><img src="assets/flow-clean.png" alt="Flow"><img src="assets/p-sleep.png" alt="Deep Sleep"></div></a>
           <div class="bundle-info"><span dir="ltr">FLOW + DEEP SLEEP</span><h3>Day &amp; Night</h3><p>מהרגע שהיום מתחיל, עד שהוא נרגע.</p><a href="https://goom.co.il/products/באנדל">לגלות את המארז <b aria-hidden="true">↗</b></a></div>
         </article>
         <article class="bundle-card bundle-all" data-reveal>
-          <a href="https://goom.co.il/products/באנדל-היכרות" aria-label="גלו את מארז GOOM Complete"><div class="bundle-art"><span class="bundle-halo"></span><span class="bundle-plinth"></span><img src="assets/flow-clean.webp" alt="Flow" loading="lazy" decoding="async"><img src="assets/p-grow.webp" alt="Grow" loading="lazy" decoding="async"><img src="assets/p-shine.webp" alt="Shine" loading="lazy" decoding="async"><img src="assets/p-sleep.webp" alt="Deep Sleep" loading="lazy" decoding="async"></div></a>
+          <a href="https://goom.co.il/products/באנדל-היכרות" aria-label="גלו את מארז GOOM Complete"><div class="bundle-art"><span class="bundle-halo"></span><span class="bundle-plinth"></span><img src="assets/flow-clean.png" alt="Flow"><img src="assets/p-grow.png" alt="Grow"><img src="assets/p-shine.png" alt="Shine"><img src="assets/p-sleep.png" alt="Deep Sleep"></div></a>
           <div class="bundle-info"><span dir="ltr">THE GOOM FAMILY</span><h3>GOOM Complete</h3><p>כל הפורמולות. מקום אחד להתחיל.</p><a href="https://goom.co.il/products/באנדל-היכרות">לגלות את המארז <b aria-hidden="true">↗</b></a></div>
         </article>
       </div>
@@ -276,7 +276,7 @@
         <div data-reveal><span class="f-eyebrow" dir="ltr">A LITTLE GOOD. EVERY DAY.</span><h2>הטוב שלך,<br><em>בגומי.</em></h2><p>בחרי מטרה, קבלי פורמולה. אפשר להתחיל מפורמולה אחת ולהמשיך למארז שמתאים לשגרה שלך.</p><div class="final-cta-actions"><a class="final-button" href="#formulas">לכל הפורמולות</a><a class="final-button alt" href="#community">לקהילת GOOM</a></div></div>
         <div class="final-art final-lineup" data-reveal aria-label="משפחת הפורמולות של GOOM">
           <span class="final-liquid" aria-hidden="true"></span>
-          <img src="assets/flow-clean.webp" alt="Flow" loading="lazy" decoding="async"><img src="assets/p-grow.webp" alt="Grow" loading="lazy" decoding="async"><img src="assets/p-shine.webp" alt="Shine" loading="lazy" decoding="async"><img src="assets/p-sleep.webp" alt="Deep Sleep" loading="lazy" decoding="async"><img src="assets/p-b12.webp" alt="B12+D3+B9" loading="lazy" decoding="async">
+          <img src="assets/flow-clean.png" alt="Flow"><img src="assets/p-grow.png" alt="Grow"><img src="assets/p-shine.png" alt="Shine"><img src="assets/p-sleep.png" alt="Deep Sleep"><img src="assets/p-b12.png" alt="B12+D3+B9">
           <span class="final-line" dir="rtl">כל יום. ה־GOOM שלו.</span>
         </div>
       </div>
