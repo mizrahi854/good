@@ -1,0 +1,83 @@
+[
+  {
+    "engine": "chromium",
+    "width": 320,
+    "height": 568,
+    "overflow": 0,
+    "productBottom": 304.4140625,
+    "captionTop": 315.484375,
+    "captionBottom": 446
+  },
+  {
+    "engine": "chromium",
+    "width": 375,
+    "height": 667,
+    "overflow": 0,
+    "productBottom": 390.609375,
+    "captionTop": 414.484375,
+    "captionBottom": 545
+  },
+  {
+    "engine": "chromium",
+    "width": 390,
+    "height": 844,
+    "overflow": 0,
+    "productBottom": 524.984375,
+    "captionTop": 547.578125,
+    "captionBottom": 714
+  },
+  {
+    "engine": "chromium",
+    "width": 430,
+    "height": 932,
+    "overflow": 0,
+    "productBottom": 579.4921875,
+    "captionTop": 635.578125,
+    "captionBottom": 802
+  },
+  {
+    "engine": "chromium",
+    "width": 768,
+    "height": 1024,
+    "overflow": 0,
+    "productBottom": 627.90625,
+    "captionTop": 727.578125,
+    "captionBottom": 894
+  },
+  {
+    "engine": "chromium",
+    "width": 844,
+    "height": 390,
+    "overflow": 0,
+    "productBottom": 280.1484375,
+    "captionTop": 157.53125,
+    "captionBottom": 275.90625
+  },
+  {
+    "engine": "chromium",
+    "width": 1440,
+    "height": 900,
+    "overflow": 0,
+    "productBottom": 666.4765625,
+    "captionTop": 395.03125,
+    "captionBottom": 688.1875
+  },
+  {
+    "engine": "webkit",
+    "width": 320,
+    "height": 568,
+    "overflow": 0,
+    "productBottom": 304.5,
+    "captionTop": 315.484375,
+    "captionBottom": 446
+  },
+  {
+    "engine": "webkit",
+    "width": 390,
+    "height": 844,
+    "overflow": 0,
+    "productBottom": 524.734375,
+    "captionTop": 547.578125,
+    "captionBottom": 714
+  }
+]

@@ -8,9 +8,12 @@
   <meta name="description" content="תוספי תזונה מדויקים בגומי לשגרה שמרגישה טוב.">
   <link rel="icon" href="assets/logo.png" type="image/png">
   <link rel="preload" href="assets/fonts/discovery-medium.woff" as="font" type="font/woff" crossorigin>
-  <link rel="stylesheet" href="site.css?v=20260908c">
-  <link rel="stylesheet" href="cinematic.css?v=20260908c">
-  <script src="app.js?v=20260908c" defer></script>
+  <link rel="preload" href="assets/sequence/portrait/f000.webp" as="image" media="not all and (max-width:900px) and (orientation:portrait)">
+  <link rel="preload" href="assets/sequence/mobile-film-v3/f000.webp" as="image" media="(max-width:900px) and (orientation:portrait)">
+  <link rel="stylesheet" href="site.css?v=20260927-mfilm7">
+  <link rel="stylesheet" href="cinematic.css?v=20260927-mfilm7">
+  <link rel="stylesheet" href="mobile-first.css?v=20260927-mfilm7">
+  <script src="app.js?v=20260927-mfilm7" defer></script>
 </head>
 <body>
 <div class="goom-page" dir="rtl">
@@ -26,12 +29,17 @@
       </nav>
       
       <!-- כפתור התחברות עם אייקון -->
-      <a class="goom-login-btn" href="/login" aria-label="התחברות לחשבון">
+      <a class="goom-login-btn" href="https://goom.co.il/account" aria-label="התחברות לחשבון">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
           <circle cx="12" cy="7" r="4"></circle>
         </svg>
       </a>
+
+      <div class="goom-mobile-tools">
+        <a href="#formulas" aria-label="מצאו את הפורמולה שלכם"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="10.5" cy="10.5" r="7.5"/><path d="m16 16 5 5"/></svg></a>
+        <a href="https://goom.co.il/cart" aria-label="סל הקניות באתר GOOM"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M4 7h16v15H4zM8 10V5a4 4 0 0 1 8 0v5"/></svg></a>
+      </div>
 
       <button class="goom-menu" type="button" aria-label="תפריט"><i></i><i></i></button>
     </div>
@@ -39,42 +47,46 @@
 
   <main id="top">
     <section class="hero uses-source-sequence" data-hero aria-labelledby="hero-title">
+      <i class="film-stop" style="--p:0" aria-hidden="true"></i><i class="film-stop" style="--p:.185" aria-hidden="true"></i><i class="film-stop" style="--p:.58" aria-hidden="true"></i><i class="film-stop" style="--p:1" aria-hidden="true"></i>
       <div class="hero-pin">
         <div class="source-sequence" aria-hidden="true">
-          <img class="source-poster" src="assets/sequence/desktop/f000.webp" alt="" fetchpriority="high">
+          <picture><source media="(max-width:900px) and (orientation:portrait)" srcset="assets/sequence/mobile-film-v3/f000.webp"><img class="source-poster" src="assets/sequence/portrait/f000.webp" alt="" fetchpriority="high"></picture>
           <canvas class="source-canvas" data-source-canvas width="1920" height="1080"></canvas>
         </div>
-        <div class="journey-scene journey-lineup" aria-hidden="true">
-          <div class="lineup-plane" data-lineup-plane>
-            <img class="lineup-bottle lineup-flow-static" src="assets/flow-clean.png" alt="">
-            <img class="journey-plate" src="assets/bg-a.jpg" alt="" fetchpriority="high">
-            <img class="lineup-bottle lineup-grow" src="assets/p-grow.png" alt="">
-            <img class="lineup-bottle lineup-b12" src="assets/p-b12.png" alt="">
-            <img class="lineup-bottle lineup-shine" src="assets/p-shine.png" alt="">
-            <img class="lineup-bottle lineup-sleep" src="assets/p-sleep.png" alt="">
-          </div>
-        </div>
-        <div class="journey-scene journey-splash" aria-hidden="true"><img src="assets/bg-c.jpg" alt=""></div>
-        <div class="journey-tether" aria-hidden="true"><svg viewBox="0 0 300 800" preserveAspectRatio="none"><defs><linearGradient id="gel-edge" x1="0" x2="1"><stop stop-color="#8261ba" stop-opacity=".3"/><stop offset=".2" stop-color="#ffffff" stop-opacity=".95"/><stop offset=".45" stop-color="#b89fdf" stop-opacity=".3"/><stop offset=".75" stop-color="#ffffff" stop-opacity=".85"/><stop offset="1" stop-color="#9a7ac9" stop-opacity=".4"/></linearGradient></defs><path d="M60 0 C35 240 8 390 38 590 C50 710 90 778 150 780 C210 778 250 710 262 590 C292 390 265 240 240 0" fill="none" stroke="url(#gel-edge)" stroke-width="16"/><path d="M60 0 C35 240 8 390 38 590 C50 710 90 778 150 780 C210 778 250 710 262 590 C292 390 265 240 240 0" fill="none" stroke="#fff" stroke-opacity=".6" stroke-width="2"/></svg></div>
-        <img class="journey-flow" src="assets/flow-clean.png" alt="פורמולת Flow של GOOM" fetchpriority="high" data-journey-flow>
-        
         <div class="hero-copy is-on" data-scene="1">
-          <img class="hero-wordmark hero-wordmark-new" src="assets/לוגו.png" alt="GOOM" width="1344" height="1200" fetchpriority="high">
+          <p class="hero-intro">תוספי תזונה לחיים טובים יותר</p>
+          <div class="hero-lettermark" dir="ltr" aria-label="GOOM"><span>GO</span><span>OM</span></div>
           <h1 id="hero-title">הטוב שלך, בגומי.</h1>
 
           <div class="hero-actions">
-            <a class="hero-btn liquid-glass" href="#formulas">מצאו את הפורמולה שלכם <span aria-hidden="true">↗</span></a>
-            <a class="hero-btn ghost liquid-glass" href="#ritual">הרגע שלכם</a>
+            <a class="hero-btn liquid-glass" href="#formulas">מצאו את הפורמולה שלכם <span aria-hidden="true">←</span></a>
           </div>
         </div>
         <div class="hero-copy" data-scene="2" aria-hidden="true" inert>
           <span class="f-eyebrow" dir="ltr">FEEL THE FLOW</span>
-          <h2>הפורמולה שמתאימה<br>לשגרה שלך.</h2>
+          <h2 class="scene-title-web">הפורמולה שמתאימה<br>לשגרה שלך.</h2>
+          <h2 class="scene-title-mobile">להיכנס<br>ל־Flow.</h2>
           <p>מיקרוביום מאוזן, תחושת קלילות ואנרגיה יומיומית עם גומיות פרוביוטיקה טעימות שתומכות בך.</p>
           <a class="hero-btn" href="#formulas">מה יש בפנים? <span aria-hidden="true">←</span></a>
         </div>
+        <div class="hero-copy" data-scene="3" aria-hidden="true" inert>
+          <h2>כל הטוב.<br>בקצב שלך.</h2>
+          <p>חמש פורמולות. השגרה שלך.</p>
+        </div>
         <p class="hero-tagline" dir="ltr">WELLNESS BUT MAKE IT TASTY</p>
-    <section class="formula journey-formula" id="formulas" data-formula tabindex="-1" aria-labelledby="formula-title">
+
+
+
+        <nav class="journey-chapters" aria-label="תחנות בחוויית GOOM">
+          <button type="button" data-chapter="0" aria-current="step"><i></i><span>הטוב שלך</span><span class="m-label">הטוב שלך</span></button>
+          <button type="button" data-chapter="1"><i></i><span>להיכנס ל־Flow</span><span class="m-label">Flow</span></button>
+          <button type="button" data-chapter="2"><i></i><span>כל הטוב</span><span class="m-label">הפורמולות</span></button>
+        </nav>
+        <span class="hero-cue" aria-hidden="true"><b></b>SCROLL DOWN <i></i></span>
+      </div>
+    </section>
+
+    <section class="formula product-section" id="formulas" data-formula tabindex="-1" aria-labelledby="formula-title">
       <div class="formula-pin">
         <div class="formula-blob" aria-hidden="true">
           <img class="formula-plate" src="assets/bg-b.jpg" alt="" decoding="async">
@@ -101,16 +113,6 @@
             <div class="formula-nodes" role="tablist" aria-label="בחירת פורמולה"></div>
           </div>
         </div>
-      </div>
-    </section>
-
-
-        <nav class="journey-chapters" aria-label="תחנות בחוויית GOOM">
-          <button type="button" data-chapter="0" aria-current="step"><i></i><span>הטוב שלך</span></button>
-          <button type="button" data-chapter="1"><i></i><span>להיכנס ל־Flow</span></button>
-          <button type="button" data-chapter="2"><i></i><span>הפורמולות</span></button>
-        </nav>
-        <span class="hero-cue" aria-hidden="true">SCROLL TO FEEL GOOD <i></i></span>
       </div>
     </section>
 
@@ -215,6 +217,7 @@
 
 
     <section class="bundles" id="bundles" aria-labelledby="bundles-title">
+      <div class="bundles-pin">
       <div class="bundles-heading" data-reveal><span class="f-eyebrow" dir="ltr">BETTER TOGETHER</span><h2 id="bundles-title">יותר טוב.<br><em>ביחד.</em></h2><p>יש דברים שפשוט משלימים זה את זה.<br>גלו את המארז שמתאים לרגעים שלכם.</p></div>
       <div class="bundle-track">
         <article class="bundle-card bundle-night" data-reveal>
@@ -230,7 +233,9 @@
           <div class="bundle-info"><span dir="ltr">THE GOOM FAMILY</span><h3>GOOM Complete</h3><p>כל הפורמולות. מקום אחד להתחיל.</p><a href="https://goom.co.il/products/באנדל-היכרות">לגלות את המארז <b aria-hidden="true">↗</b></a></div>
         </article>
       </div>
+      <div class="bundle-pagination" aria-label="בחירת מארז"><button type="button" data-bundle-step="0" aria-label="מארז ראשון" aria-current="step">01</button><button type="button" data-bundle-step="1" aria-label="מארז שני">02</button><button type="button" data-bundle-step="2" aria-label="מארז שלישי">03</button></div>
       <a class="bundles-all" href="https://goom.co.il/collections/all">לכל המארזים באתר GOOM <span aria-hidden="true">←</span></a>
+      </div>
     </section>
 
     <section class="faq" id="faq" aria-labelledby="faq-title">

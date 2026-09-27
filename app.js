@@ -17,10 +17,12 @@ class GoomSite {
     this.initAmbientMotion();
     this.initHero();
     this.initFormula();
+    this.measureJourney();
     this.initStories();
     this.initFaq();
     this.initRitual();
     this.initNavigation();
+    this.initBundleJourney();
     this.updateScroll();
   }
 
@@ -38,6 +40,8 @@ class GoomSite {
     this.journeyResize?.disconnect();
     this.navAbort?.abort();
     this.mediaAbort?.abort();
+    this.bundleAbort?.abort();
+    clearTimeout(this.bundleWheelTimer);
     cancelAnimationFrame(this.sequenceRaf);
     cancelAnimationFrame(this.decodeRaf);
     this.frameCache?.forEach(frame=>frame.bitmap.close());
@@ -47,7 +51,12 @@ class GoomSite {
 
   updateScroll() {
     this.updateHero();
+    if(this.frameVariant==='mobile-film-v3'&&this.journeyFormula){
+      // the chapter pill stays with the film and the formulas, then gets out of the way
+      document.documentElement.classList.toggle('chapters-away',this.journeyFormula.getBoundingClientRect().bottom<innerHeight*.72);
+    }
     this.updateFormula?.();
+    this.updateBundles?.();
     this.header?.classList.toggle('is-scrolled', window.scrollY > 30);
   }
 
@@ -56,36 +65,38 @@ class GoomSite {
   initHero() {
     if (!this.hero) return;
     this.copyBlocks=[...this.hero.querySelectorAll('.hero-copy')];
-    this.journeyFormula=this.hero.querySelector('.journey-formula');
+    this.journeyFormula=document.querySelector('[data-formula]');
     this.tagline=this.hero.querySelector('.hero-tagline');
     this.cue=this.hero.querySelector('.hero-cue');
     this.chapters=[...this.hero.querySelectorAll('[data-chapter]')];
     this.sequenceLayer=this.hero.querySelector('.source-sequence');
-    this.dropBottle=this.hero.querySelector('[data-journey-flow]');
     this.canvas=this.hero.querySelector('[data-source-canvas]');
     this.ctx=this.canvas.getContext('2d',{alpha:false});
     this.frameCache=new Map();this.framePending=new Set();this.frameFailures=new Set();
     this.frameAttempts=new Map();
-    this.frameQueue=[];this.frameWorkers=0;this.frameCount=146;this.renderProgress=0;
+    this.frameQueue=[];this.frameWorkers=0;this.frameCount=240;this.renderProgress=0;
     this.mediaAbort=new AbortController();
+    this.mobileFilmQuery=window.matchMedia('(max-width:900px) and (orientation:portrait)');
     this.measureJourney=()=>{
       const pin=this.hero.querySelector('.hero-pin');
       const w=pin.clientWidth,h=this.reduced?Math.max(600,innerHeight):pin.clientHeight;
-      const mobile=w<=900&&h>w;
-      const dpr=Math.min(devicePixelRatio||1,mobile?2:1.5);
+      if(this.journeyLayout?.w===w&&this.journeyLayout?.h===h)return;
+      const mobile=true;
+      const dpr=Math.min(devicePixelRatio||1,2);
       this.canvas.width=Math.round(w*dpr);this.canvas.height=Math.round(h*dpr);
       this.ctx.imageSmoothingEnabled=true;this.ctx.imageSmoothingQuality='high';
+      // Phones get the dedicated portrait film (hero -> through the bubble -> splash -> formulas).
+      // Toggle first: the class sets the section height the scroll span is measured from.
+      const film=this.mobileFilmQuery.matches;
+      this.hero.classList.toggle('is-mobile-film',film);
+      this.frameVariant=film?'mobile-film-v3':'portrait';this.frameCount=film?134:240;
+      document.documentElement.classList.toggle('has-mobile-film',film);
+      // the chapter pill must float above the formulas section too, so it leaves the pinned stage on phones
+      const rail=this.chapters[0]?.parentElement;
+      if(rail){ if(film&&rail.parentElement!==document.body)document.body.appendChild(rail);
+        else if(!film&&rail.parentElement===document.body)this.hero.querySelector('.hero-pin').insertBefore(rail,this.cue); }
       this.journeyLayout={w,h,mobile,dpr,span:Math.max(1,this.hero.offsetHeight-h)};
-      this.frameVariant=mobile?'mobile':'desktop';this.lastDrawnFrame=null;
-      if(this.reduced){
-        const plane=this.hero.querySelector('[data-lineup-plane]');
-        const pw=mobile?w*1.55:Math.max(w,h*1900/1069),ph=pw*1069/1900;
-        Object.assign(plane.style,{width:pw+'px',height:ph+'px',left:(mobile?-w*.42:(w-pw)/2)+'px',top:(mobile?h*.32:(h-ph)/2)+'px'});
-      }
-      const stage=this.hero.querySelector('.formula-stage');
-      const item=this.formulaItems?.[2];
-      const stageRect=stage.getBoundingClientRect(),pinRect=pin.getBoundingClientRect();
-      this.dropTarget={x:stageRect.left-pinRect.left+stage.clientWidth/2,y:item?parseFloat(getComputedStyle(item).top):h*(mobile?.43:.46),width:item?parseFloat(getComputedStyle(item).width):w*.19};
+      this.lastDrawnFrame=null;
       this.updateHero();this.applySourceProgress(this.renderProgress);
     };
     this.journeyResize=new ResizeObserver(this.measureJourney);
@@ -93,7 +104,7 @@ class GoomSite {
     this.measureJourney();
     if (!this.reduced) fetch('assets/sequence/manifest.json',{signal:this.mediaAbort.signal})
       .then(r=>{if(!r.ok)throw new Error('Sequence manifest');return r.json()})
-      .then(data=>{this.sequenceManifest=data;this.lastDrawnFrame=null;this.applySourceProgress(this.renderProgress);this.warmSequence();})
+      .then(data=>{this.sequenceManifest=data;this.lastDrawnFrame=null;this.applySourceProgress(this.renderProgress);})
       .catch(()=>{});
   }
 
@@ -106,7 +117,7 @@ class GoomSite {
     const tick=now=>{
       this.sequenceRaf=0;if(this.destroyed)return;
       const dt=previous?Math.min(64,now-previous):16.7;previous=now;
-      this.renderProgress+=(this.targetProgress-this.renderProgress)*(1-Math.exp(-dt/55));
+      this.renderProgress+=(this.targetProgress-this.renderProgress)*(1-Math.exp(-dt/(this.frameVariant==='mobile-film-v3'?70:32)));
       if(Math.abs(this.targetProgress-this.renderProgress)<.0004)this.renderProgress=this.targetProgress;
       this.applySourceProgress(this.renderProgress);
       if(this.renderProgress!==this.targetProgress)this.sequenceRaf=requestAnimationFrame(tick);
@@ -114,41 +125,58 @@ class GoomSite {
     this.sequenceRaf=requestAnimationFrame(tick);
   }
 
+  // Shorten the establishing holds, preserve every filmed movement in order.
+  // No synthetic bottle transform replaces the native liquid / ring sequence.
+  sourceFrameAt(p) {
+    if(this.frameVariant==='mobile-film-v3'){
+      // Three rests: hero -> bottle raised -> orange splash -> formulas. Holds give each scroll stop a still frame.
+      const film=[[0,0],[.03,0],[.16,20],[.21,20],[.52,82],[.64,98],[.97,132],[1,133]];
+      for(let i=1;i<film.length;i++){
+        const [end,last]=film[i],[start,first]=film[i-1];
+        if(p<=end)return Math.round(first+(last-first)*this.clamp((p-start)/(end-start)));
+      }
+      return 133;
+    }
+    const beats=[[0,0],[.23,64],[.43,106],[.69,164],[.95,239],[1,239]];
+    for(let i=1;i<beats.length;i++) {
+      const [end,last]=beats[i], [start,first]=beats[i-1];
+      if(p<=end)return Math.round(first+(last-first)*this.clamp((p-start)/(end-start)));
+    }
+    return 239;
+  }
+
   applySourceProgress(p) {
     if(!this.journeyLayout)return;
-    const frame=Math.min(145,Math.round(this.clamp(p/.60)*145));
+    const frame=this.sourceFrameAt(p);
+    const {mobile}=this.journeyLayout;
     this.wantedFrame=frame;
+    if(p>.01&&this.sequenceManifest&&!this.sequenceWarmStarted&&!this.reduced){
+      this.sequenceWarmStarted=true;
+      if(!navigator.connection?.saveData)this.warmSequence();
+    }
     if(!this.reduced){this.queueSequenceFrames(frame);this.drawSequenceFrame(frame);}
-    const t=this.clamp((p-.60)/.32),ease=t*t*(3-2*t),final=p>=.92;
-    const takeover=this.clamp((p-.58)/.04);
-    const {w,h,mobile}=this.journeyLayout;
-    // A single transparent bottle travels; the filmed background never rotates.
-    const source={x:w*(mobile?.536:.635),y:h*(mobile?.65:.46),width:mobile?w*.53:Math.max(w,h*16/9)*.235};
-    const target=this.dropTarget;
-    const sectionY=(1-ease)*h*.65;
-    const x=source.x+(target.x-source.x)*ease;
-    const y=source.y+(target.y+sectionY-source.y)*ease;
-    const width=source.width+(target.width-source.width)*ease;
-    this.dropBottle.style.transform=`translate3d(${x}px,${y}px,0) translate(-50%,-50%) rotate(${14*(1-ease)}deg) scale(${width/460})`;
-    this.dropBottle.style.opacity=String(this.reduced||final?0:takeover);
-    this.sequenceLayer.style.opacity=String(this.reduced?0:1-takeover);
-    this.sequenceLayer.style.transform='none';this.sequenceLayer.style.maskImage='none';
-    this.journeyFormula.style.opacity=String(this.reduced?1:this.clamp(t*2));
-    this.journeyFormula.style.transform=this.reduced?'none':`translate3d(0,${sectionY}px,0)`;
-    if(this.formulaItems?.[2])this.formulaItems[2].style.visibility=(!this.reduced&&!final)?'hidden':'visible';
-    this.journeyFormula.classList.toggle('is-arrived',final||this.reduced);
-    this.journeyFormula.inert=!final&&!this.reduced;
-    this.journeyFormula.setAttribute('aria-hidden',String(!final&&!this.reduced));
-    if(p<.60&&this.formulaActive>=0&&this.formulaActive!==2)this.goToFormula(2);
-    const scene=frame<=69?1:frame>=106&&p<.62?2:0;
+    this.sequenceLayer.style.opacity=this.reduced?'0':'1';
+    this.journeyFormula.classList.add('is-arrived');
+    this.journeyFormula.inert=false;
+    this.journeyFormula.setAttribute('aria-hidden','false');
+    const scene=this.reduced?1:this.frameVariant==='mobile-film-v3'?(frame<=24?1:frame>=76&&frame<=104?2:0):frame<=69?1:frame>=99&&frame<=168?2:frame>=180?3:0;
     this.copyBlocks.forEach(el=>{
-      const active=this.reduced||Number(el.dataset.scene)===scene;
+      const active=Number(el.dataset.scene)===scene;
       el.classList.toggle('is-on',active);el.inert=!active;el.setAttribute('aria-hidden',String(!active));
     });
-    this.tagline.style.opacity=String(1-this.clamp((frame-55)/16));
-    this.cue.style.opacity=String(1-this.clamp(p/.1));
-    const chapter=p<.44?0:p<.80?1:2;
-    this.chapters.forEach((b,i)=>{if(i===chapter)b.setAttribute('aria-current','step');else b.removeAttribute('aria-current');});
+    this.tagline.style.opacity=String(1-this.clamp(p/.1));
+    this.cue.style.opacity=String(1-this.clamp(p/.06));
+    this.hero.classList.toggle('is-opening',p<.08);
+    const chapter=p<.40?0:p<.73?1:2;
+    if(this.frameVariant!=='mobile-film-v3')this.chapters.forEach((button,i)=>{if(i===chapter)button.setAttribute('aria-current','step');else button.removeAttribute('aria-current');});
+    if(this.frameVariant==='mobile-film-v3'){
+      // The film's last frame is the formulas section itself; the live section fades in exactly on top of it.
+      this.journeyFormula.classList.toggle('is-film-pending',p<.985);
+      this.hero.classList.toggle('is-film-landed',p>=.985);
+      document.documentElement.classList.toggle('film-opening',p<.08);
+      const step=p<.36?0:p<.985?1:2;
+      this.chapters.forEach((button,i)=>{if(i===step)button.setAttribute('aria-current','step');else button.removeAttribute('aria-current');});
+    }
     this.hero.dataset.progress=p.toFixed(4);
     this.hero.dataset.sourceFrame=String(frame);
   }
@@ -158,7 +186,7 @@ class GoomSite {
     const variant=this.frameVariant;
     const frames=[center];
     const direction=center>=(this.previousWanted??0)?1:-1;
-    for(let d=1;d<=10;d++){frames.push(center+d*direction,center-d*direction);}
+    for(let d=1;d<=5;d++){frames.push(center+d*direction,center-d*direction);}
     this.previousWanted=center;
     this.frameQueue=frames.filter(n=>n>=0&&n<this.frameCount).map(n=>({n,key:variant+':'+n,variant}))
       .filter(x=>!this.frameCache.has(x.key)&&!this.framePending.has(x.key)&&!this.frameFailures.has(x.key));
@@ -177,7 +205,7 @@ class GoomSite {
         .then(bitmap=>{
           if(this.destroyed){bitmap.close();return;}
           this.frameCache.set(job.key,{bitmap,n:job.n,variant:job.variant});
-          const keep=this.journeyLayout.mobile?20:24;
+          const keep=12;
           while(this.frameCache.size>keep){
             const victim=[...this.frameCache.entries()].sort((a,b)=>{
               const score=v=>Math.abs(v.n-this.wantedFrame)+(v.variant!==this.frameVariant?1000:0);
@@ -208,25 +236,12 @@ class GoomSite {
     if(key===this.lastDrawnFrame)return;
     const {w,h,mobile,dpr}=this.journeyLayout;
     const ctx=this.ctx;ctx.setTransform(dpr,0,0,dpr,0,0);
-    const rgb=this.sequenceManifest?.colors?.[frame.n]||[204,193,220];
-    const color=`rgb(${rgb.join(',')})`;
-    ctx.fillStyle=color;ctx.fillRect(0,0,w,h);
-    if(mobile){
-      // Reframe the whole recorded shot; no independent bottle or liquid motion.
-      const t=this.clamp((frame.n-65)/45),smooth=t*t*(3-2*t);
-      const dw=w*(1.55+smooth*.4),dh=dw*9/16;
-      const dx=w*.53-dw*.62,dy=h*(.32+smooth*.08);
-      ctx.drawImage(frame.bitmap,dx,dy,dw,dh);
-      const edge=dh*.1;
-      let g=ctx.createLinearGradient(0,dy,0,dy+edge);g.addColorStop(0,color);g.addColorStop(1,`rgba(${rgb.join(',')},0)`);
-      ctx.fillStyle=g;ctx.fillRect(0,dy,w,edge);
-      g=ctx.createLinearGradient(0,dy+dh-edge,0,dy+dh);g.addColorStop(0,`rgba(${rgb.join(',')},0)`);g.addColorStop(1,color);
-      ctx.fillStyle=g;ctx.fillRect(0,dy+dh-edge,w,edge+1);
-    }else{
-      const scale=Math.max(w/frame.bitmap.width,h/frame.bitmap.height);
-      const dw=frame.bitmap.width*scale,dh=frame.bitmap.height*scale;
-      ctx.drawImage(frame.bitmap,(w-dw)/2,(h-dh)/2,dw,dh);
-    }
+    // Portrait frames are composed offline. One scale preserves the exact
+    // source proportions at every phone ratio; the camera never stretches art.
+    ctx.fillStyle='#dfd0ec';ctx.fillRect(0,0,w,h);
+    const scale=Math.max(w/frame.bitmap.width,h/frame.bitmap.height);
+    const dw=frame.bitmap.width*scale,dh=frame.bitmap.height*scale;
+    ctx.drawImage(frame.bitmap,(w-dw)/2,(h-dh)/2,dw,dh);
     this.lastDrawnFrame=key;this.hero.dataset.renderedFrame=String(frame.n);
     this.hero.classList.add('sequence-ready');
   }
@@ -270,13 +285,16 @@ class GoomSite {
       if (!chapter && !anchor) return;
       closeMenu();
       const id = anchor?.getAttribute('href');
-      if (chapter || id === '#formulas') {
+      if (chapter) {
         event.preventDefault();
-        const beat = chapter ? [0,.50,.96][Number(chapter.dataset.chapter)] : .96;
-        if (beat===.96 && this.formulaActive!==2) this.goToFormula(2);
-        const top = this.reduced && beat===.96 ? this.journeyFormula.getBoundingClientRect().top+scrollY : this.hero.getBoundingClientRect().top+scrollY+beat*this.journeyLayout.span;
+        const beat=(this.frameVariant==='mobile-film-v3'?[0,.58,1]:[0,.50,.86])[Number(chapter.dataset.chapter)];
+        const top=this.hero.getBoundingClientRect().top+scrollY+beat*this.journeyLayout.span;
         window.scrollTo({top,behavior:this.reduced?'instant':'smooth'});
+      } else if(id==='#formulas') {
+        event.preventDefault();
+        scrollTo({top:this.journeyFormula.getBoundingClientRect().top+scrollY,behavior:this.reduced?'instant':'smooth'});
       }
+
     },{signal});
     this.formulaSection?.addEventListener('keydown',event => {
       if (!event.target.closest('.formula-arrow')) return;
@@ -287,9 +305,17 @@ class GoomSite {
       this.goToFormula(next,true);
 
     },{signal});
-    if (location.hash === '#formulas') requestAnimationFrame(() => {
-      window.scrollTo({top:this.hero.getBoundingClientRect().top+scrollY+this.journeyLayout.span*.96,behavior:'instant'});
-    });
+    const followHash=()=>{
+      if(location.hash==='#how'){
+        history.replaceState(null,'','#ritual');
+        requestAnimationFrame(()=>document.querySelector('#ritual').scrollIntoView({behavior:'instant'}));
+      }else if(location.hash==='#formulas'){
+        requestAnimationFrame(()=>this.journeyFormula.scrollIntoView({behavior:'instant',block:'start'}));
+      }
+    };
+    window.addEventListener('hashchange',followHash,{signal});
+    followHash();
+
   }
 
   initRitual() {
@@ -481,6 +507,89 @@ class GoomSite {
     this.goToFormula(2);
   }
 
+  /* A portrait scroll chapter: each touch / wheel gesture advances one card.
+     The first/last boundaries always release back to normal document scroll. */
+  initBundleJourney() {
+    const section=document.querySelector('#bundles');
+    if(!section)return;
+    const cards=[...section.querySelectorAll('.bundle-card')];
+    const dots=[...section.querySelectorAll('[data-bundle-step]')];
+    const media=matchMedia('(max-width:900px) and (orientation:portrait)');
+    this.bundleAbort=new AbortController();
+    const signal=this.bundleAbort.signal;
+    const enabled=()=>media.matches&&!this.reduced;
+    let active=-1,touchStart=0,touchConsumed=false,wheelConsumed=false;
+    const geometry=()=>{
+      const top=section.getBoundingClientRect().top+scrollY;
+      const height=section.querySelector('.bundles-pin').clientHeight;
+      return {top,height,span:section.offsetHeight-height};
+    };
+    const paint=index=>{
+      if(index===active)return;
+      active=index;section.dataset.activeBundle=String(index);
+      cards.forEach((card,i)=>{
+        card.classList.add('is-visible');
+        card.classList.toggle('is-current',i===index);
+        card.classList.toggle('is-before',i<index);
+        card.inert=enabled()&&i!==index;
+        card.setAttribute('aria-hidden',String(enabled()&&i!==index));
+      });
+      dots.forEach((dot,i)=>i===index?dot.setAttribute('aria-current','step'):dot.removeAttribute('aria-current'));
+    };
+    this.updateBundles=()=>{
+      if(!enabled()){
+        cards.forEach(card=>{card.inert=false;card.removeAttribute('aria-hidden');});
+        active=-1;return;
+      }
+      const {top,height}=geometry();
+      paint(this.clamp(Math.round((scrollY-top)/(height*.8)),0,cards.length-1));
+    };
+    const seek=index=>{
+      const {top,height}=geometry();
+      paint(index);
+      // An instant document position change keeps the sticky stage stationary;
+      // the cards themselves carry the visible, interruptible transition.
+      scrollTo({top:top+index*height*.8,behavior:'instant'});
+    };
+    const step=direction=>{
+      if(!enabled())return false;
+      const {top,span}=geometry(),local=scrollY-top;
+      if(local< -1||local>span+1)return false;
+      if(direction<0&&active===0)return false;
+      if(direction>0&&active===cards.length-1)return false;
+      seek(this.clamp(active+direction,0,cards.length-1));return true;
+    };
+    section.addEventListener('touchstart',event=>{
+      if(event.touches.length!==1)return;
+      touchStart=event.touches[0].clientY;touchConsumed=false;
+    },{passive:true,signal});
+    section.addEventListener('touchmove',event=>{
+      if(!enabled()||event.touches.length!==1)return;
+      const delta=touchStart-event.touches[0].clientY;
+      if(touchConsumed){event.preventDefault();return;}
+      const {top,span}=geometry(),local=scrollY-top;
+      const canStep=delta>0?active<cards.length-1:active>0;
+      if(local>=-1&&local<=span+1&&canStep)event.preventDefault();
+      if(Math.abs(delta)<32)return;
+      if(step(Math.sign(delta))){touchConsumed=true;event.preventDefault();}
+    },{passive:false,signal});
+    section.addEventListener('wheel',event=>{
+      if(!enabled()||Math.abs(event.deltaY)<=Math.abs(event.deltaX))return;
+      clearTimeout(this.bundleWheelTimer);
+      this.bundleWheelTimer=setTimeout(()=>{wheelConsumed=false;},180);
+      if(wheelConsumed){event.preventDefault();return;}
+      if(step(Math.sign(event.deltaY))){wheelConsumed=true;event.preventDefault();}
+    },{passive:false,signal});
+    section.addEventListener('keydown',event=>{
+      if(event.target.closest('a,button,input'))return;
+      const direction=['ArrowDown','PageDown',' '].includes(event.key)?1:['ArrowUp','PageUp'].includes(event.key)?-1:0;
+      if(direction&&step(direction))event.preventDefault();
+    },{signal});
+    dots.forEach((dot,i)=>dot.addEventListener('click',()=>seek(i),{signal}));
+    media.addEventListener('change',()=>{active=-1;this.updateBundles();},{signal});
+    this.updateBundles();
+  }
+
   /* ---------- Testimonial ring ---------- */
   initStories() {
     const stories = document.querySelector('#stories');
@@ -531,7 +640,7 @@ class GoomSite {
     toggle?.addEventListener('click', () => setPaused(!paused));
     if (this.reduced) setPaused(true);
 
-    scene.addEventListener('pointerenter', () => { hovering = true; });
+    scene.addEventListener('pointerenter', event => { hovering = event.pointerType==='mouse'; });
     scene.addEventListener('pointerleave', () => { hovering = false; });
     let moved = false;
     scene.addEventListener('pointerdown', event => {
@@ -539,18 +648,20 @@ class GoomSite {
       moved = false;
       dragStart = event.clientX;
       dragAngle = angle;
-      scene.setPointerCapture?.(event.pointerId);
     });
     scene.addEventListener('pointermove', event => {
       if (!dragging) return;
-      if (Math.abs(event.clientX - dragStart) > 4) moved = true;
+      if (Math.abs(event.clientX - dragStart) > 4) {
+        moved = true;
+        scene.setPointerCapture?.(event.pointerId);
+      }
       angle = dragAngle + (event.clientX - dragStart) * 0.28;
       apply(true);
     });
     const endDrag = event => {
       if (!dragging) return;
       dragging = false;
-      scene.releasePointerCapture?.(event.pointerId);
+      if(scene.hasPointerCapture?.(event.pointerId))scene.releasePointerCapture(event.pointerId);
       if (moved) setPaused(true);
       angle = Math.round(angle / stepAngle) * stepAngle;
       apply(false);
@@ -563,7 +674,7 @@ class GoomSite {
       const video = slot.querySelector('video');
       if (!video) return;
       slots.forEach(other => { if (other !== slot) other.querySelector('video')?.pause(); });
-      if (video.paused) { video.preload = 'auto'; video.play().catch(() => {}); }
+      if (video.paused) { setPaused(true);video.preload = 'auto';video.muted=false;video.play().catch(() => {}); }
       else video.pause();
     }));
 

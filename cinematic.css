@@ -431,3 +431,83 @@
  .bundle-art img,.final-lineup img,.gh-brand-photo>img,.ritual-orbit { animation:none; }
  [data-reveal]:not(.how-card) { transform:none!important; opacity:1; transition:none; }
 }
+/* Stable viewport geometry and mobile handoff — September 11. */
+.uses-source-sequence .journey-splash { display:block; z-index:2; transform:none; }
+html { scroll-padding-top:90px; }
+@media(max-width:900px) and (orientation:portrait) {
+ .hero-pin { min-height:0; height:100svh; }
+ .goom-header { padding-inline:12px; }
+ .goom-bar { min-height:56px; padding-inline:18px; }
+ .goom-menu { min-width:44px; min-height:44px; }
+ .goom-login-btn { display:flex; align-items:center; justify-content:center; width:44px; height:44px; }
+ .hero-copy[data-scene="1"],.hero-copy[data-scene="1"].is-on { top:88px; }
+ .hero-copy[data-scene="1"] .hero-wordmark-new { width:min(57vw,25svh); margin-top:-20px; }
+ .hero-copy[data-scene="1"] .hero-actions { top:calc(100svh - 88px - 115px); }
+ .hero-copy[data-scene="2"] { top:100px; }
+ .hero-copy[data-scene="2"] h2 { font-size:clamp(30px,8.5vw,42px); line-height:1.05; }
+ .hero-copy[data-scene="2"] p { font-size:14px; margin:12px 0; }
+ .hero-copy[data-scene="2"] .hero-btn { min-height:44px; padding-block:10px; }
+ .journey-formula .formula-head { inset:96px 6vw 118px; width:auto; max-width:none; height:auto; display:flex; flex-direction:column; }
+ .formula-head h2 { font-size:clamp(27px,7.5vw,34px); }
+ .formula-head .f-eyebrow { margin-bottom:8px; }
+ .formula-caption { position:static; margin-top:auto; width:auto; min-height:0; padding:0; }
+ .formula-caption h3 { font-size:27px; margin-block:8px; }
+ .formula-caption p { font-size:14px; line-height:1.45; max-width:30ch; margin:8px 0 0; }
+ .formula-caption .f-kicker { font-size:8px; }
+ .formula-caption .f-cta { min-height:44px; margin-top:14px; }
+ .formula-stage { inset:0; }
+ .formula-item { top:48%; width:min(35vw,22svh); max-width:170px; }
+ .formula-arrows { bottom:62px; left:6vw; display:flex; gap:12px; }
+ .formula-arrow { width:46px; height:46px; }
+ .journey-chapters { bottom:12px; gap:14px; left:4vw; right:4vw; }
+ .journey-chapters button { min-height:36px; font-size:10px; }
+ .ritual { padding:72px 6vw 62px; min-height:0; }
+ .ritual-copy>h2 { font-size:clamp(48px,14vw,64px); }
+ .ritual-stage { min-height:320px; }
+ .ritual-options button { min-height:48px; }
+ .stories-scene { touch-action:pan-y; }
+ .gh-brand { padding-block:70px; }
+ .gh-brand-statement h2 { font-size:clamp(38px,11vw,54px); }
+ .gh-brand-photo { min-height:420px; }
+ .gh-brand-photo video { height:400px; }
+ .gh-brand-copy p { font-size:17px; }
+ .community-head h2 { font-size:clamp(34px,10vw,48px); }
+ .community-track img { width:160px; }
+ .bundles-heading h2 { font-size:clamp(50px,15vw,65px); }
+ .bundle-card { flex-basis:88%; }
+ .bundle-art { height:300px; }
+ .bundle-art img { height:185px; }
+ .faq { padding-inline:6vw; }
+ .faq-head h2 { font-size:clamp(33px,10vw,45px); }
+ .faq-q { min-height:60px; font-size:16px; }
+ .final-cta h2 { font-size:clamp(58px,17vw,78px); }
+ .final-cta-actions { gap:10px; }
+ .final-button { padding:12px 18px; font-size:14px; }
+ .final-lineup { height:340px; }
+ .footer-grid { gap:28px 20px; }
+ .footer-col a { display:inline-block; padding-block:5px; }
+}
+@media(max-width:900px) and (orientation:portrait) and (max-height:720px) {
+ .hero-copy[data-scene="1"] .hero-wordmark-new { width:min(46vw,23svh); }
+ .hero-copy[data-scene="1"] h1 { font-size:20px; }
+ .hero-copy[data-scene="2"] { top:86px; }
+ .hero-copy[data-scene="2"] .f-eyebrow { display:none; }
+ .hero-copy[data-scene="2"] h2 { font-size:29px; max-width:14ch; }
+ .hero-copy[data-scene="2"] p { font-size:12px; max-width:37ch; margin-block:9px; }
+ .hero-copy[data-scene="2"] .hero-btn { font-size:12px; min-height:40px; }
+ .journey-formula .formula-head { inset:84px 6vw 108px; }
+ .formula-head .f-eyebrow { display:none; }
+ .formula-head h2 { font-size:27px; }
+ .formula-item { top:43%; width:min(31vw,18svh); }
+ .formula-caption h3 { font-size:24px; margin:5px 0; }
+ .formula-caption p { font-size:12px; margin-top:5px; }
+ .formula-caption .f-cta { margin-top:10px; }
+ .formula-caption .f-kicker { display:none; }
+}
+@media(prefers-reduced-motion:reduce) {
+ .uses-source-sequence .journey-splash { display:none; }
+ .hero-pin { height:auto; }
+}
+@media(max-width:900px) and (orientation:portrait) and (max-height:600px) {
+ .formula-item { top:41%; }
+}
