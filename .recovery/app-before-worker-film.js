@@ -121,8 +121,8 @@ class GoomSite {
     const tick=now=>{
       this.sequenceRaf=0;if(this.destroyed)return;
       const dt=previous?Math.min(64,now-previous):16.7;previous=now;
-      this.renderProgress+=(this.targetProgress-this.renderProgress)*(1-Math.exp(-dt/(this.film?26:32)));
-      if(Math.abs(this.targetProgress-this.renderProgress)<(this.film?.00008:.0004))this.renderProgress=this.targetProgress;
+      this.renderProgress+=(this.targetProgress-this.renderProgress)*(1-Math.exp(-dt/(this.film?14:32)));
+      if(Math.abs(this.targetProgress-this.renderProgress)<.0004)this.renderProgress=this.targetProgress;
       this.applySourceProgress(this.renderProgress);
       if(this.renderProgress!==this.targetProgress)this.sequenceRaf=requestAnimationFrame(tick);
     };
@@ -149,205 +149,130 @@ class GoomSite {
     return 239;
   }
 
-  // Phone film: fractional frame position, so neighbouring frames can be blended while scrolling.
-  sourcePosAt(p) {
-    const film=[[0,0],[.03,0],[.16,20],[.21,20],[.52,82],[.64,98],[.97,132],[1,133]];
-    for(let i=1;i<film.length;i++){
-      const [end,last]=film[i],[start,first]=film[i-1];
-      if(p<=end)return first+(last-first)*this.clamp((p-start)/Math.max(1e-6,end-start));
-    }
-    return 133;
-  }
-
   applySourceProgress(p) {
     if(!this.journeyLayout)return;
-    const phone=this.frameVariant==='mobile-film-v4';
-    const pos=phone?this.sourcePosAt(p):null;
-    const frame=phone?Math.round(pos):this.sourceFrameAt(p);
-    this.wantedFrame=frame;this.filmPos=pos;
+    const frame=this.sourceFrameAt(p);
+    const {mobile}=this.journeyLayout;
+    this.wantedFrame=frame;
     if(p>.01&&this.sequenceManifest&&!this.sequenceWarmStarted&&!this.reduced&&!this.film){
       this.sequenceWarmStarted=true;
       if(!navigator.connection?.saveData)this.warmSequence();
     }
     if(!this.reduced){this.queueSequenceFrames(frame);this.drawSequenceFrame(frame);}
-
-    // Everything below touches the DOM; it runs only when a visible state actually changes,
-    // never on every scroll frame (style recalculation is what makes phones stutter).
-    const scene=this.reduced?1:phone?(frame<=24?1:frame>=76&&frame<=104?2:0):frame<=69?1:frame>=99&&frame<=168?2:frame>=180?3:0;
-    const step=phone?(p<.36?0:p<.985?1:2):(p<.40?0:p<.73?1:2);
-    const tag=Math.round((1-this.clamp(p/.1))*20), cue=Math.round((1-this.clamp(p/.06))*20);
-    const key=[scene,step,tag,cue,p<.08,p<.985,this.reduced].join('|');
-    if(key!==this.heroStateKey){
-      this.heroStateKey=key;
-      this.sequenceLayer.style.opacity=this.reduced?'0':'1';
-      if(!this.formulaOpened){this.formulaOpened=true;this.journeyFormula.classList.add('is-arrived');this.journeyFormula.inert=false;this.journeyFormula.setAttribute('aria-hidden','false');}
-      this.copyBlocks.forEach(el=>{
-        const active=Number(el.dataset.scene)===scene;
-        if(el.classList.contains('is-on')!==active){el.classList.toggle('is-on',active);el.inert=!active;el.setAttribute('aria-hidden',String(!active));}
-      });
-      this.tagline.style.opacity=String(tag/20);
-      this.cue.style.opacity=String(cue/20);
-      this.hero.classList.toggle('is-opening',p<.08);
+    this.sequenceLayer.style.opacity=this.reduced?'0':'1';
+    this.journeyFormula.classList.add('is-arrived');
+    this.journeyFormula.inert=false;
+    this.journeyFormula.setAttribute('aria-hidden','false');
+    const scene=this.reduced?1:this.frameVariant==='mobile-film-v4'?(frame<=24?1:frame>=76&&frame<=104?2:0):frame<=69?1:frame>=99&&frame<=168?2:frame>=180?3:0;
+    this.copyBlocks.forEach(el=>{
+      const active=Number(el.dataset.scene)===scene;
+      el.classList.toggle('is-on',active);el.inert=!active;el.setAttribute('aria-hidden',String(!active));
+    });
+    this.tagline.style.opacity=String(1-this.clamp(p/.1));
+    this.cue.style.opacity=String(1-this.clamp(p/.06));
+    this.hero.classList.toggle('is-opening',p<.08);
+    const chapter=p<.40?0:p<.73?1:2;
+    if(this.frameVariant!=='mobile-film-v4')this.chapters.forEach((button,i)=>{if(i===chapter)button.setAttribute('aria-current','step');else button.removeAttribute('aria-current');});
+    if(this.frameVariant==='mobile-film-v4'){
+      // The film's last frame is the formulas section itself; the live section fades in exactly on top of it.
+      this.journeyFormula.classList.toggle('is-film-pending',p<.985);
+      this.hero.classList.toggle('is-film-landed',p>=.985);
+      document.documentElement.classList.toggle('film-opening',p<.08);
+      const step=p<.36?0:p<.985?1:2;
       this.chapters.forEach((button,i)=>{if(i===step)button.setAttribute('aria-current','step');else button.removeAttribute('aria-current');});
-      if(phone){
-        // The film's last frame is the formulas section itself; the live section fades in exactly on top of it.
-        // Its images are decoded while the film plays, so arriving never costs a paint/decode stall.
-        if(step>=1&&!this.formulaPrimed){
-          this.formulaPrimed=true;
-          this.journeyFormula.querySelectorAll('img').forEach(img=>{img.loading='eager';img.decode?.().catch(()=>{});});
-        }
-        const pending=p<.985;
-        this.journeyFormula.classList.toggle('is-film-pending',pending);
-
-        this.hero.classList.toggle('is-film-landed',p>=.985);
-        document.documentElement.classList.toggle('film-opening',p<.08);
-      }
     }
-    if(frame!==this.lastFrameAttr){
-      this.lastFrameAttr=frame;
-      this.hero.dataset.sourceFrame=String(frame);
-      this.hero.dataset.progress=p.toFixed(3);
-    }
+    this.hero.dataset.progress=p.toFixed(4);
+    this.hero.dataset.sourceFrame=String(frame);
   }
 
-  /* ---------- Phone film engine ----------
-     A Web Worker fetches every frame (first scroll first, then coarse-to-fine) and decodes them
-     off the main thread, cropped and resized to the canvas, then hands over ImageBitmaps with
-     zero copy. The main thread only blits: scrolling never waits on image decoding. */
-  static filmWorkerSource() { return `
-    let base,n,order,crop,cw,ch,lanes=6,cursor=0,blobs=[],want=[],inflight=new Set(),active=0,gen=0,resizeOK=true,canBitmap=typeof createImageBitmap==='function';
-    const pad=i=>String(i).padStart(3,'0');
-    onmessage=e=>{const m=e.data;
-      if(m.type==='init'){base=m.base;n=m.n;order=m.order;crop=m.crop;cw=m.cw;ch=m.ch;gen=m.gen;lanes=m.lanes;blobs=new Array(n);
-        for(let k=0;k<lanes;k++)lane();}
-      else if(m.type==='size'){crop=m.crop;cw=m.cw;ch=m.ch;gen=m.gen;inflight.clear();}
-      else if(m.type==='want'){want=m.list;pump();}
-    };
-    async function lane(){
-      while(cursor<order.length){const i=order[cursor++];if(blobs[i])continue;
-        for(let a=0;a<3;a++){try{const r=await fetch(base+'f'+pad(i)+'.webp',{priority:cursor<42?'high':'low'});if(!r.ok)throw 0;blobs[i]=await r.blob();break;}catch(_){await new Promise(r=>setTimeout(r,180*(a+1)));}}
-        if(blobs[i]&&!canBitmap)postMessage({type:'blob',i,blob:blobs[i]});
-        pump();
-      }
-    }
-    function pump(){
-      if(!canBitmap)return;
-      while(active<2){
-        const k=want.findIndex(i=>blobs[i]&&!inflight.has(i));
-        if(k<0)return;
-        const i=want.splice(k,1)[0];inflight.add(i);active++;
-        decode(i,gen).finally(()=>{active--;inflight.delete(i);pump();});
-      }
-    }
-    async function decode(i,g){
-      const b=blobs[i];let bm=null,full=false;
-      try{if(resizeOK)bm=await createImageBitmap(b,crop[0],crop[1],crop[2],crop[3],{resizeWidth:cw,resizeHeight:ch,resizeQuality:'high'});}catch(_){resizeOK=false;}
-      if(!bm){try{bm=await createImageBitmap(b,crop[0],crop[1],crop[2],crop[3]);}catch(_){try{bm=await createImageBitmap(b);full=true;}catch(__){}}}
-      if(bm)postMessage({type:'bitmap',i,gen:g,full,bitmap:bm},[bm]);
-    }`; }
-
+  /* ---------- Phone film: fast path ----------
+     Every compressed frame (~54 KB) is fetched right away, in playback order, and kept as a Blob.
+     Decoding runs ahead of the scroll direction, cropped and resized to the canvas once, so each
+     paint is a 1:1 blit. Bitmap memory stays bounded; nothing waits for the user to scroll first. */
   startFilm() {
-    const cw=this.canvas.width, ch=this.canvas.height, n=this.frameCount;
-    const base=new URL(`assets/sequence/${this.frameVariant}/`,location.href).href;
-    const prev=this.film;
-    if(prev&&prev.base===base&&prev.cw===cw&&prev.ch===ch)return;
+    const {w,h}=this.journeyLayout, cw=this.canvas.width, ch=this.canvas.height;
+    const base=`assets/sequence/${this.frameVariant}/`;
+    if(this.film&&this.film.base===base&&this.film.cw===cw&&this.film.ch===ch)return;
+    const blobs=this.film?.base===base?this.film.blobs:new Array(this.frameCount);
+    this.film?.bitmaps.forEach(b=>b.close());
     const SW=720,SH=1560,scale=Math.max(cw/SW,ch/SH),sw=cw/scale,sh=ch/scale;
-    const f=this.film={base,cw,ch,n,crop:[(SW-sw)/2,(SH-sh)/2,sw,sh],gen:(prev?.gen||0)+1,
-      bitmaps:new Map(),blobs:prev?.base===base?prev.blobs:new Array(n),keep:24,ahead:18,behind:6,dir:1,last:0,drawKey:'',worker:null};
-    prev?.bitmaps.forEach(e=>e.bitmap.close?.());
-    if(prev?.worker&&prev.base===base){
-      f.worker=prev.worker;f.worker.postMessage({type:'size',crop:f.crop,cw,ch,gen:f.gen});
-    }else{
-      prev?.worker?.terminate();
-      const order=[],seen=new Set(),add=i=>{if(i>=0&&i<n&&!seen.has(i)){seen.add(i);order.push(i);}};
-      for(let i=0;i<=24;i++)add(i);
-      for(const step of [8,4,2,1])for(let i=0;i<n;i+=step)add(i);
-      try{
-        const url=URL.createObjectURL(new Blob([GoomSite.filmWorkerSource()],{type:'text/javascript'}));
-        f.worker=new Worker(url);URL.revokeObjectURL(url);
-        f.worker.postMessage({type:'init',base,n,order,crop:f.crop,cw,ch,gen:f.gen,lanes:navigator.connection?.saveData?2:6});
-      }catch(_){f.worker=null;}
-    }
-    if(f.worker)f.worker.onmessage=e=>this.onFilmMessage(e.data);
+    const f=this.film={base,cw,ch,blobs,bitmaps:new Map(),decoding:new Set(),dir:1,last:0,
+      crop:[(SW-sw)/2,(SH-sh)/2,sw,sh],keep:28,ahead:22,behind:8,drawn:-1};
+    if(f.fetching)return;
+    f.fetching=true;
+    const signal=this.mediaAbort.signal, n=this.frameCount;
+    // Load order: the first scroll in full, then a coarse-to-fine skeleton of the whole film,
+    // so any scroll position always has a near frame even on a slow connection.
+    const order=[],seen=new Set(),add=i=>{if(i>=0&&i<n&&!seen.has(i)){seen.add(i);order.push(i);}};
+    for(let i=0;i<=24;i++)add(i);
+    for(const step of [8,4,2,1])for(let i=0;i<n;i+=step)add(i);
+    add(n-1);
+    let cursor=0;
+    const pad=i=>String(i).padStart(3,'0');
+    const worker=async()=>{
+      while(cursor<order.length&&!this.destroyed&&this.film===f){
+        const i=order[cursor++];
+        if(f.blobs[i])continue;
+        for(let attempt=0;attempt<3;attempt++){
+          try{
+            const r=await fetch(`${base}f${pad(i)}.webp`,{signal,priority:cursor<42?'high':'low'});
+            if(!r.ok)throw new Error('frame '+i);
+            f.blobs[i]=await r.blob();break;
+          }catch(e){ if(e.name==='AbortError')return; await new Promise(res=>setTimeout(res,180*(attempt+1))); }
+        }
+        if(this.film===f&&i>=this.wantedFrame-f.behind&&i<=this.wantedFrame+f.ahead)this.filmQueue(this.wantedFrame??0);
+      }
+    };
+    const lanes=navigator.connection?.saveData?2:6;
+    for(let k=0;k<lanes;k++)worker();
     this.filmQueue(this.wantedFrame??0);
-  }
-
-  onFilmMessage(m) {
-    const f=this.film;
-    if(!f){m.bitmap?.close();return;}
-    if(m.type==='bitmap'){
-      if(m.gen!==f.gen||f.bitmaps.has(m.i)||this.destroyed){m.bitmap.close();return;}
-      f.bitmaps.set(m.i,{bitmap:m.bitmap,full:m.full,i:m.i});
-      this.filmEvict();
-      if(Math.abs(m.i-(this.filmPos??this.wantedFrame))<2||!this.hero.classList.contains('sequence-ready'))this.filmDraw(this.filmPos);
-    }else if(m.type==='blob'){
-      // very old engines: the worker cannot decode, so the page does it (still async)
-      f.blobs[m.i]=m.blob;this.filmQueue(this.wantedFrame??0);
-    }
   }
 
   stopFilm() {
     if(!this.film)return;
-    this.film.bitmaps.forEach(e=>e.bitmap.close?.());
-    this.film.worker?.terminate();
+    this.film.bitmaps.forEach(b=>b.close());
     this.film=null;
-  }
-
-  filmEvict() {
-    const f=this.film,c=this.wantedFrame??0;
-    if(!f||f.bitmaps.size<=f.keep)return;
-    const lo=f.dir>0?c-f.behind:c-f.ahead, hi=f.dir>0?c+f.ahead:c+f.behind;
-    [...f.bitmaps.keys()].filter(i=>i<lo||i>hi).sort((a,b)=>Math.abs(b-c)-Math.abs(a-c))
-      .slice(0,f.bitmaps.size-f.keep).forEach(i=>{f.bitmaps.get(i).bitmap.close?.();f.bitmaps.delete(i);});
   }
 
   filmQueue(center) {
     const f=this.film; if(!f)return;
     const dir=center>f.last?1:center<f.last?-1:f.dir; f.dir=dir; f.last=center;
-    const list=[];
-    const push=i=>{if(i>=0&&i<f.n&&!f.bitmaps.has(i))list.push(i);};
-    push(center);push(center+dir);
-    for(let d=1;d<=f.ahead;d++){push(center+dir*(d+1));if(d<=f.behind)push(center-dir*d);}
-    if(f.worker){
-      const sig=list.join(',');
-      if(sig!==f.lastWant){f.lastWant=sig;f.worker.postMessage({type:'want',list});}
-    }else{
-      // fallback: decode on the page, one at a time
-      if(f.decodingMain)return;
-      const i=list.find(k=>f.blobs[k]);
-      if(i===undefined)return;
-      f.decodingMain=true;
-      createImageBitmap(f.blobs[i]).then(bm=>{f.decodingMain=false;if(this.film!==f){bm.close();return;}
-        f.bitmaps.set(i,{bitmap:bm,full:true,i});this.filmEvict();this.filmDraw(this.filmPos);this.filmQueue(this.wantedFrame);},()=>{f.decodingMain=false;});
+    const n=this.frameCount, lo=dir>0?center-f.behind:center-f.ahead, hi=dir>0?center+f.ahead:center+f.behind;
+    // evict what the scroll has left behind
+    if(f.bitmaps.size>f.keep){
+      [...f.bitmaps.keys()].filter(i=>i<lo||i>hi).sort((a,b)=>Math.abs(b-center)-Math.abs(a-center))
+        .slice(0,f.bitmaps.size-f.keep).forEach(i=>{f.bitmaps.get(i).close();f.bitmaps.delete(i);});
+    }
+    const want=[center];
+    for(let d=1;d<=f.ahead;d++){want.push(center+dir*d);if(d<=f.behind)want.push(center-dir*d);}
+    for(const i of want){
+      if(f.decoding.size>=3)break;
+      if(i<0||i>=n||f.bitmaps.has(i)||f.decoding.has(i)||!f.blobs[i])continue;
+      if(f.bitmaps.size+f.decoding.size>=f.keep+4)break;
+      f.decoding.add(i);
+      const [sx,sy,sw,sh]=f.crop;
+      createImageBitmap(f.blobs[i],sx,sy,sw,sh,{resizeWidth:f.cw,resizeHeight:f.ch,resizeQuality:'high'})
+        .catch(()=>createImageBitmap(f.blobs[i],sx,sy,sw,sh))
+        .then(bm=>{
+          f.decoding.delete(i);
+          if(this.film!==f||this.destroyed){bm.close();return;}
+          f.bitmaps.set(i,bm);
+          if(Math.abs(i-this.wantedFrame)<Math.abs(f.drawn-this.wantedFrame)||f.drawn<0)this.filmDraw(this.wantedFrame);
+          this.filmQueue(this.wantedFrame);
+        },()=>{f.decoding.delete(i);});
     }
   }
 
-  filmBlit(e,alpha) {
-    const f=this.film,ctx=this.ctx;
-    ctx.globalAlpha=alpha;
-    if(e.full){const [sx,sy,sw,sh]=f.crop;ctx.drawImage(e.bitmap,sx,sy,sw,sh,0,0,f.cw,f.ch);}
-    else ctx.drawImage(e.bitmap,0,0,f.cw,f.ch);
-  }
-
-  filmDraw(pos) {
+  filmDraw(want) {
     const f=this.film; if(!f)return;
-    pos=pos??this.wantedFrame??0;
-    const a=Math.floor(pos), t=pos-a;
-    let A=f.bitmaps.get(a), B=t>.04?f.bitmaps.get(Math.min(f.n-1,a+1)):null;
-    if(!A&&B&&t>=.5){A=B;B=null;}
-    if(!A){let best=1e9;f.bitmaps.forEach(e=>{const d=Math.abs(e.i-pos);if(d<best){best=d;A=e;}});B=null;}
-    if(!A)return;
-    const mix=B?Math.round(t*16)/16:0;
-    const key=A.i+'|'+(B?B.i+':'+mix:'');
-    if(key===f.drawKey)return;
-    f.drawKey=key;
+    let i=f.bitmaps.has(want)?want:-1;
+    if(i<0){let best=1e9;f.bitmaps.forEach((_,k)=>{const d=Math.abs(k-want);if(d<best){best=d;i=k;}});}
+    if(i<0||i===f.drawn)return;
+    const bm=f.bitmaps.get(i);
     this.ctx.setTransform(1,0,0,1,0,0);
-    this.filmBlit(A,1);
-    if(B&&mix>0)this.filmBlit(B,mix);
-    this.ctx.globalAlpha=1;
-    const shown=B&&mix>=.5?B.i:A.i;
-    if(shown!==this.renderedAttr){this.renderedAttr=shown;this.hero.dataset.renderedFrame=String(shown);}
-    if(!this.filmReady){this.filmReady=true;this.hero.classList.add('sequence-ready');}
+    this.ctx.drawImage(bm,0,0,f.cw,f.ch);
+    f.drawn=i;this.hero.dataset.renderedFrame=String(i);
+    this.hero.classList.add('sequence-ready');
   }
 
   queueSequenceFrames(center) {
@@ -398,7 +323,7 @@ class GoomSite {
 
   drawSequenceFrame(want) {
     if(!this.ctx||this.reduced)return;
-    if(this.film)return this.filmDraw(this.filmPos??want);
+    if(this.film)return this.filmDraw(want);
     const variant=this.frameVariant;
     let frame=this.frameCache.get(variant+':'+want);
     if(!frame)frame=[...this.frameCache.values()].filter(f=>f.variant===variant).sort((a,b)=>Math.abs(a.n-want)-Math.abs(b.n-want))[0];
@@ -566,7 +491,7 @@ class GoomSite {
     }
     if(this.reduced)return;
     this.motionObserver=new IntersectionObserver(entries=>entries.forEach(entry=>entry.target.classList.toggle('motion-visible',entry.isIntersecting)),{threshold:.05});
-    document.querySelectorAll('.ritual,.bundles,.final-cta,.gh-brand,#press,#community').forEach(el=>this.motionObserver.observe(el));
+    document.querySelectorAll('.ritual,.bundles,.final-cta,.gh-brand').forEach(el=>this.motionObserver.observe(el));
   }
 
   /* ---------- Formula stage ---------- */
@@ -612,12 +537,7 @@ class GoomSite {
       item.className = 'formula-item';
       item.dataset.index = String(index);
       item.setAttribute('aria-label', `הצגת פורמולת ${f.name}`);
-      // Phones get the same bottle with its shadow baked in: a live drop-shadow filter is re-rasterised
-      // by WebKit on every state change and caused the stall when the film hands over to this section.
-      const baked = this.bakedShadows ??= window.matchMedia('(max-width:900px)').matches;
-      item.innerHTML = baked
-        ? `<img class="is-baked" src="${f.img.replace('.webp','-sh.webp')}" alt="${f.name}" loading="lazy" decoding="async">`
-        : `<img src="${f.img}" alt="${f.name}" loading="lazy" decoding="async">`;
+      item.innerHTML = `<img src="${f.img}" alt="${f.name}" loading="lazy" decoding="async">`;
       item.tabIndex=-1;item.style.pointerEvents='none';
       rail.appendChild(item);
       return item;
@@ -812,11 +732,10 @@ class GoomSite {
 
     const apply = (free) => { ring.classList.toggle('is-free', free !== false); ring.style.transform = `rotateY(${angle}deg)`; };
     const tick = (now) => {
-      if (!this.storiesVisible) { this.storyRaf = 0; last = 0; return; }
       this.storyRaf = requestAnimationFrame(tick);
       const delta = last ? Math.min(64, now - last) : 0;
       last = now;
-      if (paused || hovering || dragging) return;
+      if (paused || hovering || dragging || !this.storiesVisible) return;
       angle -= delta * speed;
       apply(true);
     };
@@ -883,11 +802,12 @@ class GoomSite {
     this.storiesVisible = false;
     this.storyObserver = new IntersectionObserver(([entry]) => {
       this.storiesVisible = entry.isIntersecting;
-      if (entry.isIntersecting) { stories.classList.add('is-in-view'); if (!this.storyRaf) this.storyRaf = requestAnimationFrame(tick); }
+      if (entry.isIntersecting) stories.classList.add('is-in-view');
     }, { threshold: 0.08 });
     this.storyObserver.observe(stories);
 
     apply(true);
+    this.storyRaf = requestAnimationFrame(tick);
   }
 
 

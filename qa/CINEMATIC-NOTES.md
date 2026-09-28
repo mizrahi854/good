@@ -53,3 +53,12 @@ Frames `mobile-film-v4/` at 720×1560 WebP q74 (7.4 MB, ~54 KB/frame; was 12 MB)
 
 ### Buttons + second speed pass — 2026-09-28
 One button system on phones: every text button is the same liquid-glass pill (48px, 14px/600), every icon button the same 52px circle; deep violet = main action or selected, light glass = secondary. No square buttons remain (checked by computed radius). Frames load first-scroll-first, then coarse-to-fine (every 8th, 4th, 2nd, all). Video posters load only near their section; all content images below the hero are lazy; formula background → WebP (215 → 74 KB); desktop-only manifest not fetched on phones. Non-film bytes in the first 1.5 s: ~1.75 MB → ~330 KB. Slow-4G test (8 Mbps / 70 ms), full sweep 1.5 s after open: max lag 1 frame.
+
+### Real-phone smoothness pass — 2026-09-28
+Benchmark: `node qa/perf-mobile-film.cjs` (WebKit + Chrome, 390×844 @3×, finger-like 2.4 s sweep down and up; prints rAF p50/p95/max, long frames and where they happen; `ONLY=webkit` for one engine).
+- Frames are fetched and decoded in a Web Worker (inline Blob URL) and transferred as ImageBitmaps; the main thread only blits. Fallback: worker posts Blobs and the page decodes.
+- Neighbouring frames are blended by the fractional film position (`sourcePosAt`), 1/16 alpha steps; redraw only when the pair/mix changes.
+- DOM writes in `applySourceProgress` happen only when a visible state changes (no per-scroll-frame attribute/class/style writes).
+- No `backdrop-filter` on phones (glass = gradients + highlights); press/community marquees and the story ring loop stop off screen.
+- The landing stall was the bottles' live `filter: drop-shadow` (WebKit re-rasterises it on reveal: 167 ms). Phones now use `*-sh.webp` with the identical shadow baked in (`.formula-item img.is-baked`, padded canvas, same position). Reveal cost 167 → 34 ms (two-frame measurement floor).
+Result (WebKit): max frame 113–197 ms → 39 ms, p95 18 ms. Desktop keeps the original images and filters.

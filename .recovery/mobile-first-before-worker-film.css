@@ -257,7 +257,6 @@
 
   /* the film's last frame is this section; it appears exactly on top of it */
   .hero.is-mobile-film + #formulas { position:relative; z-index:2; margin-top:-100svh; transition:opacity 320ms cubic-bezier(.22,1,.36,1),visibility 0s; }
-  /* painted and decoded in advance (opacity, not visibility), so the landing is only a fade */
   .hero.is-mobile-film + #formulas.is-film-pending { opacity:0; visibility:hidden; pointer-events:none; transition:opacity 180ms ease-in,visibility 0s 180ms; }
   .hero.is-mobile-film + #formulas .formula-arrows { bottom:92px; }
   .hero.is-mobile-film + #formulas .formula-head { bottom:150px; }
@@ -279,7 +278,7 @@
 @media (max-width:900px) {
   :root {
     --btn-h:48px; --btn-h-sm:42px;
-    --glass-light: linear-gradient(180deg,rgba(255,255,255,.86) 0%,rgba(246,240,255,.66) 50%,rgba(233,222,252,.76) 100%);
+    --glass-light: linear-gradient(180deg,rgba(255,255,255,.66) 0%,rgba(255,255,255,.3) 50%,rgba(238,229,255,.4) 100%);
     --glass-light-edge: inset 0 1px 0 rgba(255,255,255,.95), inset 0 -1px 0 rgba(122,92,206,.2), inset 0 0 0 1px rgba(255,255,255,.45), 0 10px 26px -12px rgba(52,28,118,.35), 0 2px 6px rgba(52,28,118,.08);
     --glass-deep: linear-gradient(180deg,rgba(108,78,200,.9) 0%,rgba(62,36,146,.92) 52%,rgba(42,22,106,.95) 100%);
     --glass-deep-edge: inset 0 1px 0 rgba(255,255,255,.5), inset 0 -2px 6px rgba(20,8,60,.32), inset 0 0 0 1px rgba(255,255,255,.16), 0 14px 30px -12px rgba(40,18,110,.6), 0 3px 8px rgba(40,18,110,.16);
@@ -289,12 +288,14 @@
     display:inline-flex!important; align-items:center; justify-content:center; gap:10px;
     min-height:var(--btn-h)!important; padding:0 24px!important; border-radius:999px!important; border:0!important;
     font-size:14px!important; font-weight:600!important; line-height:1!important; letter-spacing:.005em; text-decoration:none!important; white-space:nowrap;
+    -webkit-backdrop-filter:blur(16px) saturate(170%); backdrop-filter:blur(16px) saturate(170%);
     transition:transform 160ms cubic-bezier(.22,1,.36,1),box-shadow 200ms ease,background 200ms ease,color 200ms ease;
   }
   /* every icon button: identical circle */
   :is(.formula-arrow, .stories-arrow, .bundle-pagination button) {
     display:inline-grid!important; place-items:center; padding:0!important; border:0!important; border-radius:50%!important;
     width:52px!important; height:52px!important; min-width:52px; min-height:52px; font-size:20px; font-weight:600;
+    -webkit-backdrop-filter:blur(16px) saturate(170%); backdrop-filter:blur(16px) saturate(170%);
     transition:transform 160ms cubic-bezier(.22,1,.36,1),box-shadow 200ms ease,background 200ms ease,color 200ms ease;
   }
   .bundle-pagination button { width:44px!important; height:44px!important; min-width:44px; min-height:44px; font-size:13px; }
@@ -314,7 +315,8 @@
   .ritual-link span, .bundles-all span { font-size:16px; }
 
   /* the chapter rail is a glass container, not a button */
-  .journey-chapters { background:var(--glass-light)!important; box-shadow:var(--glass-light-edge)!important; border:0!important; }
+  .journey-chapters { background:var(--glass-light)!important; box-shadow:var(--glass-light-edge)!important; border:0!important;
+    -webkit-backdrop-filter:blur(16px) saturate(170%); backdrop-filter:blur(16px) saturate(170%); }
 
   :is(.hero-copy .hero-btn,.formula-caption .f-cta,.final-button,.bundle-info a,.bundles-all,.ritual-link,.faq-head a,.stories-pause,.ritual [data-ritual],.formula-arrow,.stories-arrow,.bundle-pagination button):active { transform:scale(.96); }
   :is(.hero-copy .hero-btn,.formula-caption .f-cta,.final-button,.bundle-info a,.bundles-all,.ritual-link,.faq-head a,.stories-pause,.ritual [data-ritual],.formula-arrow,.stories-arrow,.bundle-pagination button,.journey-chapters button):focus-visible { outline:2px solid #fff; outline-offset:3px; box-shadow:0 0 0 5px rgba(62,36,146,.55)!important; }
@@ -328,22 +330,4 @@
   .ritual-options { display:flex!important; flex-wrap:wrap; justify-content:center; gap:8px!important; border:0!important; background:none!important; }
   .ritual-options [data-ritual] { flex:0 1 auto; padding:0 14px!important; }
   .bundle-pagination { gap:10px!important; }
-}
-
-/* Phones: no live blur anywhere. Blurring what sits behind a header or a pill means re-blurring the
-   film canvas on every frame — the single most expensive thing a phone GPU can be asked to do while
-   scrolling. The glass look comes from layered gradients and a top highlight instead. */
-@media (max-width:900px) {
-  *, *::before, *::after { -webkit-backdrop-filter:none!important; backdrop-filter:none!important; }
-  .goom-header.is-scrolled .goom-bar { background:linear-gradient(180deg,rgba(246,240,255,.95),rgba(233,223,248,.93))!important;
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 8px 22px -14px rgba(52,28,118,.45),0 1px 0 rgba(53,37,90,.06)!important; }
-  .goom-header.menu-open .goom-nav { background:rgba(244,238,253,.97)!important; }
-  /* nothing animates off screen while the film plays */
-  html.has-mobile-film .press-track, html.has-mobile-film .community-track { animation-play-state:paused; }
-  html.has-mobile-film .motion-visible .press-track, html.has-mobile-film .motion-visible .community-track { animation-play-state:running; }
-}
-
-/* Bottles with the shadow baked into the image (same drop-shadow, padded canvas): no live filter on phones. */
-@media (max-width:900px) {
-  .formula-item img.is-baked { filter:none!important; width:145.7%; max-width:none; margin:0 -22.85% -36.3%; }
 }
