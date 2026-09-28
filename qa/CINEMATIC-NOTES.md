@@ -62,3 +62,13 @@ Benchmark: `node qa/perf-mobile-film.cjs` (WebKit + Chrome, 390×844 @3×, finge
 - No `backdrop-filter` on phones (glass = gradients + highlights); press/community marquees and the story ring loop stop off screen.
 - The landing stall was the bottles' live `filter: drop-shadow` (WebKit re-rasterises it on reveal: 167 ms). Phones now use `*-sh.webp` with the identical shadow baked in (`.formula-item img.is-baked`, padded canvas, same position). Reveal cost 167 → 34 ms (two-frame measurement floor).
 Result (WebKit): max frame 113–197 ms → 39 ms, p95 18 ms. Desktop keeps the original images and filters.
+
+### Final acceptance — 2026-09-28 (34/34 pass)
+`node qa/final-perf.cjs` — WebKit and Chrome (1×, 4×, 6× CPU), 375×667 / 390×844 / 430×932 @3×, touch; slow 6 s, normal 2.4 s, fast 0.8 s and flick sweeps; cold loads on 4G and slow 4G. Raw output: `qa/final-perf-results.txt`.
+Criteria: p95 ≤ 20 ms (Chrome: its headless build here is fixed at 30 Hz even on about:blank, so p95 ≤ 35 ms), worst frame ≤ 50 ms (70 ms at 4–6× CPU), average frame lag ≤ 1, zero long tasks, settles on the exact frame, no errors / 404s / overflow; first frame ≤ 1 s on 4G.
+Fixes made during this run:
+- Stale "already requested" check could leave the start frame undecoded after scrolling back (showed frame 1 at the top). Request signature now includes a cache version.
+- Quarter-resolution proxies of all 134 frames (~40 MB) are decoded in idle worker slots; very fast scrolls show the exact frame from its proxy until the sharp one lands (WebKit fast-sweep lag 1.38 → 0.02 frames).
+- Bottle shadows on phones: the unchanged bottle image plus a separate pre-rendered shadow image behind it (`*-shadow.webp`), instead of resizing a baked image inside a <button>.
+Results: WebKit p95 17–18 ms, worst 33–40 ms, lag ≤ 0.05; Chrome 0 long tasks even at 6×; first frame 0.25 s (4G) / 0.97 s (slow 4G); first scroll ready 1.0 s / 4.2 s; all frames 3.5 s / 15.8 s.
+Known tool limit: Playwright's WebKit does not render CSS perspective in screenshots (verified on a two-div test page), so the 3D formula ring looks flat in WebKit screenshots only; geometry measures identical to Chrome.

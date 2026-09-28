@@ -215,7 +215,7 @@ class GoomSite {
      off the main thread, cropped and resized to the canvas, then hands over ImageBitmaps with
      zero copy. The main thread only blits: scrolling never waits on image decoding. */
   static filmWorkerSource() { return `
-    let base,n,order,crop,cw,ch,lanes=6,cursor=0,blobs=[],want=[],inflight=new Set(),active=0,gen=0,resizeOK=true,canBitmap=typeof createImageBitmap==='function',proxyQ=[],proxyOK=true;
+    let base,n,order,crop,cw,ch,lanes=6,cursor=0,blobs=[],want=[],inflight=new Set(),active=0,gen=0,resizeOK=true,canBitmap=typeof createImageBitmap==='function';
     const pad=i=>String(i).padStart(3,'0');
     onmessage=e=>{const m=e.data;
       if(m.type==='init'){base=m.base;n=m.n;order=m.order;crop=m.crop;cw=m.cw;ch=m.ch;gen=m.gen;lanes=m.lanes;blobs=new Array(n);
@@ -227,7 +227,6 @@ class GoomSite {
       while(cursor<order.length){const i=order[cursor++];if(blobs[i])continue;
         for(let a=0;a<3;a++){try{const r=await fetch(base+'f'+pad(i)+'.webp',{priority:cursor<42?'high':'low'});if(!r.ok)throw 0;blobs[i]=await r.blob();break;}catch(_){await new Promise(r=>setTimeout(r,180*(a+1)));}}
         if(blobs[i]&&!canBitmap)postMessage({type:'blob',i,blob:blobs[i]});
-        if(blobs[i])proxyQ.push(i);
         pump();
       }
     }
@@ -235,21 +234,10 @@ class GoomSite {
       if(!canBitmap)return;
       while(active<3){
         const k=want.findIndex(i=>blobs[i]&&!inflight.has(i));
-        if(k>=0){
-          const i=want.splice(k,1)[0];inflight.add(i);active++;
-          decode(i,gen).finally(()=>{active--;inflight.delete(i);pump();});
-          continue;
-        }
-        // idle slot: build the quarter-resolution proxy used during very fast scrolls
-        if(proxyOK&&proxyQ.length&&active<2){const i=proxyQ.shift();active++;proxy(i,gen).finally(()=>{active--;pump();});continue;}
-        return;
+        if(k<0)return;
+        const i=want.splice(k,1)[0];inflight.add(i);active++;
+        decode(i,gen).finally(()=>{active--;inflight.delete(i);pump();});
       }
-    }
-    async function proxy(i,g){
-      const pw=Math.max(1,Math.round(cw/4)),ph=Math.max(1,Math.round(ch/4));
-      try{const bm=await createImageBitmap(blobs[i],crop[0],crop[1],crop[2],crop[3],{resizeWidth:pw,resizeHeight:ph,resizeQuality:'medium'});
-        if(bm.width>pw*1.5){bm.close();proxyOK=false;return;} // engine ignored the resize: proxies would cost full memory
-        postMessage({type:'proxy',i,gen:g,bitmap:bm},[bm]);}catch(_){proxyOK=false;}
     }
     async function decode(i,g){
       const b=blobs[i];let bm=null,full=false;
@@ -265,8 +253,8 @@ class GoomSite {
     if(prev&&prev.base===base&&prev.cw===cw&&prev.ch===ch)return;
     const SW=720,SH=1560,scale=Math.max(cw/SW,ch/SH),sw=cw/scale,sh=ch/scale;
     const f=this.film={base,cw,ch,n,crop:[(SW-sw)/2,(SH-sh)/2,sw,sh],gen:(prev?.gen||0)+1,
-      bitmaps:new Map(),proxies:new Map(),blobs:prev?.base===base?prev.blobs:new Array(n),keep:22,ahead:16,behind:5,dir:1,last:0,drawKey:'',worker:null,ver:0};
-    prev?.bitmaps.forEach(e=>e.bitmap.close?.());prev?.proxies?.forEach(b=>b.close?.());
+      bitmaps:new Map(),blobs:prev?.base===base?prev.blobs:new Array(n),keep:30,ahead:24,behind:6,dir:1,last:0,drawKey:'',worker:null,ver:0};
+    prev?.bitmaps.forEach(e=>e.bitmap.close?.());
     if(prev?.worker&&prev.base===base){
       f.worker=prev.worker;f.worker.postMessage({type:'size',crop:f.crop,cw,ch,gen:f.gen});
     }else{
@@ -291,11 +279,7 @@ class GoomSite {
       if(m.gen!==f.gen||f.bitmaps.has(m.i)||this.destroyed){m.bitmap.close();return;}
       f.bitmaps.set(m.i,{bitmap:m.bitmap,full:m.full,i:m.i});f.ver++;
       this.filmEvict();
-      if(Math.abs(m.i-(this.filmPos??this.wantedFrame))<2||f.showingProxy||!this.hero.classList.contains('sequence-ready'))this.filmDraw(this.filmPos);
-    }else if(m.type==='proxy'){
-      if(m.gen!==f.gen||f.proxies.has(m.i)){m.bitmap.close();return;}
-      f.proxies.set(m.i,m.bitmap);
-      if(!f.bitmaps.has(Math.round(this.filmPos??0))&&Math.abs(m.i-(this.filmPos??0))<2)this.filmDraw(this.filmPos);
+      if(Math.abs(m.i-(this.filmPos??this.wantedFrame))<2||!this.hero.classList.contains('sequence-ready'))this.filmDraw(this.filmPos);
     }else if(m.type==='blob'){
       // very old engines: the worker cannot decode, so the page does it (still async)
       f.blobs[m.i]=m.blob;this.filmQueue(this.wantedFrame??0);
@@ -305,7 +289,6 @@ class GoomSite {
   stopFilm() {
     if(!this.film)return;
     this.film.bitmaps.forEach(e=>e.bitmap.close?.());
-    this.film.proxies.forEach(b=>b.close?.());
     this.film.worker?.terminate();
     this.film=null;
   }
@@ -349,17 +332,13 @@ class GoomSite {
   filmDraw(pos) {
     const f=this.film; if(!f)return;
     pos=pos??this.wantedFrame??0;
-    const a=Math.floor(pos), b=Math.min(f.n-1,a+1), t=pos-a;
-    // Exact frame at full resolution; else the exact frame's proxy (very fast scrolls); else the nearest full frame.
-    const pick=i=>{const e=f.bitmaps.get(i);if(e)return e;const pb=f.proxies.get(i);return pb?{bitmap:pb,full:false,i,proxy:true}:null;};
-    let A=pick(a), B=t>.04?pick(b):null;
+    const a=Math.floor(pos), t=pos-a;
+    let A=f.bitmaps.get(a), B=t>.04?f.bitmaps.get(Math.min(f.n-1,a+1)):null;
     if(!A&&B&&t>=.5){A=B;B=null;}
     if(!A){let best=1e9;f.bitmaps.forEach(e=>{const d=Math.abs(e.i-pos);if(d<best){best=d;A=e;}});B=null;}
     if(!A)return;
-    // never blend a sharp frame with a soft proxy: pick one kind for the pair
-    if(B&&!!A.proxy!==!!B.proxy){if(t<.5)B=null;else{A=B;B=null;}}
     const mix=B?Math.round(t*16)/16:0;
-    const key=A.i+(A.proxy?'p':'')+'|'+(B?B.i+(B.proxy?'p':'')+':'+mix:'');
+    const key=A.i+'|'+(B?B.i+':'+mix:'');
     if(key===f.drawKey)return;
     f.drawKey=key;
     this.ctx.setTransform(1,0,0,1,0,0);
@@ -369,8 +348,6 @@ class GoomSite {
     const shown=B&&mix>=.5?B.i:A.i;
     if(shown!==this.renderedAttr){this.renderedAttr=shown;this.hero.dataset.renderedFrame=String(shown);}
     if(!this.filmReady){this.filmReady=true;this.hero.classList.add('sequence-ready');}
-    // a proxy is on screen: redraw as soon as the sharp frame lands
-    f.showingProxy=!!(A.proxy||B?.proxy);
   }
 
   queueSequenceFrames(center) {
@@ -635,11 +612,11 @@ class GoomSite {
       item.className = 'formula-item';
       item.dataset.index = String(index);
       item.setAttribute('aria-label', `הצגת פורמולת ${f.name}`);
-      // Phones: the same drop-shadow, pre-rendered as its own image behind the bottle. A live
-      // filter: drop-shadow is re-rasterised by WebKit on every state change (150+ ms at the film's landing).
-      const flat = this.flatShadows ??= window.matchMedia('(max-width:900px)').matches;
-      item.innerHTML = flat
-        ? `<img class="bottle-shadow" src="${f.img.replace('.webp','-shadow.webp')}" alt="" aria-hidden="true" loading="lazy" decoding="async"><img class="is-flat" src="${f.img}" alt="${f.name}" loading="lazy" decoding="async">`
+      // Phones get the same bottle with its shadow baked in: a live drop-shadow filter is re-rasterised
+      // by WebKit on every state change and caused the stall when the film hands over to this section.
+      const baked = this.bakedShadows ??= window.matchMedia('(max-width:900px)').matches;
+      item.innerHTML = baked
+        ? `<img class="is-baked" src="${f.img.replace('.webp','-sh.webp')}" alt="${f.name}" loading="lazy" decoding="async">`
         : `<img src="${f.img}" alt="${f.name}" loading="lazy" decoding="async">`;
       item.tabIndex=-1;item.style.pointerEvents='none';
       rail.appendChild(item);

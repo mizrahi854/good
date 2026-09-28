@@ -343,7 +343,9 @@
   html.has-mobile-film .motion-visible .press-track, html.has-mobile-film .motion-visible .community-track { animation-play-state:running; }
 }
 
-/* Bottles with the shadow baked into the image (same drop-shadow, padded canvas): no live filter on phones. */
+/* Bottles keep their exact layout; the identical drop-shadow is a separate pre-rendered image behind them
+   (no live filter on phones). Offsets match drop-shadow(0 18px 20px) on a 132px-wide bottle. */
 @media (max-width:900px) {
-  .formula-item img.is-baked { filter:none!important; width:145.7%; max-width:none; margin:0 -22.85% -36.3%; }
+  .formula-item img.is-flat, .formula-item.is-dim img.is-flat { filter:none!important; position:relative; z-index:1; }
+  .formula-item .bottle-shadow { position:absolute; left:-22.85%; top:0; width:145.7%!important; max-width:none; height:auto; z-index:0; pointer-events:none; filter:none!important; }
 }
